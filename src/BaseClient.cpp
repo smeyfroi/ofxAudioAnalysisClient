@@ -1,17 +1,10 @@
-#include "ofxAudioAnalysisClient.h"
+#include "BaseClient.hpp"
 #include "ofxOsc.h"
 #include "OscPrintReceivedElements.h"
 
 namespace ofxAudioAnalysisClient {
 
-LiveClient::LiveClient(std::string host, short port) {
-  if (!tcpClient.setup(host, port)) {
-    ofLogError() << "Failed to open TCP connection to " << host << ":" << port << std::endl;
-    ofExit(-1);
-  } else {
-    ofLogNotice() << "Connected to analyser " << host << ":" << port << std::endl;
-  }
-
+BaseClient::BaseClient() {
   plots.resize(4);
   plotValueIndexes.resize(4);
   changePlot(0, static_cast<int>(AnalysisScalar::peakEnergy));
@@ -36,24 +29,24 @@ ofxHistoryPlot* makePlot(float* plottedValuePtr, std::string name, float low, fl
   return plotPtr;
 }
 
-void LiveClient::resetPlots() {
+void BaseClient::resetPlots() {
   for (const auto& plotPtr : plots) {
     plotPtr->reset();
   }
 }
 
-void LiveClient::changePlot(size_t plotIndex, size_t valueIndex) {
+void BaseClient::changePlot(size_t plotIndex, size_t valueIndex) {
   plots[plotIndex] = std::unique_ptr<ofxHistoryPlot>(makePlot(&scalarValues[valueIndex], scalarNames[valueIndex], minScalarValues[valueIndex], maxScalarValues[valueIndex]));
   plotValueIndexes[plotIndex] = valueIndex;
 }
 
-void LiveClient::drawPlots(float width, float height) {
+void BaseClient::drawPlots(float width, float height) {
   for(int i = 0; i < 4; i++) {
     plots[i]->draw(0, i * height, width, height);
   }
 }
 
-bool LiveClient::keyPressed(int key, int plotIndex) {
+bool BaseClient::keyPressed(int key, int plotIndex) {
   if (key == OF_KEY_UP) {
     changePlot(plotIndex, (plotValueIndexes[plotIndex]+1) % static_cast<int>(AnalysisScalar::_count));
     resetPlots();
@@ -66,8 +59,8 @@ bool LiveClient::keyPressed(int key, int plotIndex) {
   return true;
 }
 
-void LiveClient::update() {
-  int packetSize = tcpClient.receiveRawMsg(buf, MAX_PACKET_SIZE);
+void BaseClient::update() {
+  int packetSize = nextOscPacket();
   while (packetSize > 0) { // process any backlog
     const osc::ReceivedPacket packet(buf, packetSize);
     if (packetSize > MAX_PACKET_SIZE) {
@@ -148,7 +141,7 @@ void LiveClient::update() {
 //      mfcc[i++] = (*iter).AsFloat();
     }
 
-    packetSize = tcpClient.receiveRawMsg(buf, MAX_PACKET_SIZE);
+    packetSize = nextOscPacket();
   } // while clearing backlog
 }
 
