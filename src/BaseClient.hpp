@@ -23,7 +23,7 @@ public:
   inline float getScalarValue(int scalarIndex) {
     return scalarValues[scalarIndex];
   };
-  void update();
+  virtual void update() { updateOsc(); };
   void drawPlots(float width, float height);
   bool keyPressed(int key, int plotIndex);
 
@@ -31,7 +31,7 @@ protected:
   static constexpr int MAX_PACKET_SIZE = 512;
   char buf[MAX_PACKET_SIZE];
   virtual int nextOscPacket() = 0;
-  
+
 private:
   std::vector<std::unique_ptr<ofxHistoryPlot>> plots;
   std::vector<size_t> plotValueIndexes;
@@ -60,6 +60,8 @@ private:
     "Energy Difference", "Spectral Difference", "Spectral Difference HWR", "Complex Spectral Difference", "High Frequency Content",
     "Pitch"
   };
+
+  void updateOsc();
 
 };
 

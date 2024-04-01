@@ -59,7 +59,7 @@ bool BaseClient::keyPressed(int key, int plotIndex) {
   return true;
 }
 
-void BaseClient::update() {
+void BaseClient::updateOsc() {
   int packetSize = nextOscPacket();
   while (packetSize > 0) { // process any backlog
     const osc::ReceivedPacket packet(buf, packetSize);
