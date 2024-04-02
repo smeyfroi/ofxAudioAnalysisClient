@@ -1,4 +1,5 @@
 #include "BaseClient.hpp"
+#include <algorithm>
 #include "ofxOsc.h"
 #include "OscPrintReceivedElements.h"
 
@@ -143,6 +144,40 @@ void BaseClient::updateOsc() {
 
     packetSize = nextOscPacket();
   } // while clearing backlog
+}
+
+
+
+float BaseClient::frequencyToMidi(float freq) const {
+    float midi;
+    if (freq < 2. || freq > 100000.) return 0.; // avoid nans and infs
+    /* log(freq/A-2)/log(2) */
+    midi = freq / 6.875;
+    midi = logf(midi) / 0.69314718055995;
+    midi *= 12;
+    midi -= 3;
+    return std::max(0.0f, midi);
+};
+
+float BaseClient::getNoteFrequency() const {
+//  if(_doDetect[GIST_PITCH] ){
+      return frequencyToMidi(scalarValues[static_cast<int>(AnalysisScalar::pitch)]);
+//  }
+};
+
+const string n[] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+const std::string BaseClient::getNoteName() const {
+    int val = getNoteFrequency();
+    int relVal = val % 12;
+    int oct = floor(val/12);
+    return n[relVal]+"-"+ofToString(oct);
+};
+
+const std::pair<float, float> BaseClient::getNote() const {
+  int val = getNoteFrequency();
+  int relVal = val % 12;
+  int oct = floor(val/12);
+  return std::pair<float, float> { relVal, oct };
 }
 
 } //namespace

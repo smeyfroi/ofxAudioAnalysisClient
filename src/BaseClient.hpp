@@ -23,6 +23,12 @@ public:
   inline float getScalarValue(int scalarIndex) {
     return scalarValues[scalarIndex];
   };
+  
+  float frequencyToMidi(float freq) const;
+  float getNoteFrequency() const;
+  const std::string getNoteName() const;
+  const std::pair<float, float> getNote() const;
+
   virtual void update() { updateOsc(); };
   void drawPlots(float width, float height);
   bool keyPressed(int key, int plotIndex);
