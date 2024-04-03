@@ -42,18 +42,21 @@ void BaseClient::changePlot(size_t plotIndex, size_t valueIndex) {
 }
 
 void BaseClient::drawPlots(float width, float height) {
+  if (!plotsVisible) return;
   for(int i = 0; i < 4; i++) {
     plots[i]->draw(0, i * height, width, height);
   }
 }
 
 bool BaseClient::keyPressed(int key, int plotIndex) {
-  if (key == OF_KEY_UP) {
+  if (key == '<') {
     changePlot(plotIndex, (plotValueIndexes[plotIndex]+1) % static_cast<int>(AnalysisScalar::_count));
     resetPlots();
-  } else if (key == OF_KEY_DOWN) {
+  } else if (key == '>') {
     changePlot(plotIndex, (plotValueIndexes[plotIndex]-1+static_cast<int>(AnalysisScalar::_count)) % static_cast<int>(AnalysisScalar::_count));
     resetPlots();
+  } else if (key == 'p') {
+    plotsVisible = !plotsVisible;
   } else {
     return false;
   }
@@ -107,7 +110,10 @@ void BaseClient::updateOsc() {
     osc::ReceivedBundleElement element4 = *bundleIter++;
     osc::ReceivedMessage message4(element4);
     osc::ReceivedMessage::const_iterator messageIter4 = message4.ArgumentsBegin();
-    scalarValues[static_cast<int>(AnalysisScalar::pitch)] = (*messageIter4++).AsFloat();
+    float pitchEstimate = (*messageIter4++).AsFloat();
+    if (pitchEstimate < 10000) {
+      scalarValues[static_cast<int>(AnalysisScalar::pitch)] = pitchEstimate;
+    }
     // /spectrum
 //    osc::ReceivedBundleElement element5 = *bundleIter++;
 //    osc::ReceivedMessage message5(element5);

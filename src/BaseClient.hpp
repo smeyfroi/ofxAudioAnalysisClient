@@ -69,6 +69,7 @@ private:
 
   void updateOsc();
 
+  bool plotsVisible;
 };
 
 } // namespace
