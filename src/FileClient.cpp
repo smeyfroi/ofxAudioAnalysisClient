@@ -4,7 +4,8 @@ namespace ofxAudioAnalysisClient {
 
 FileClient::FileClient(std::string directoryName_)
 : directoryName(directoryName_),
-  lastFrame(-1)
+  lastFrame(-1),
+  soundPlayerVolume(0)
 {
   soundPlayer.load(directoryName + "/____-46_137_90_x_22141-0-1.wav");
   std::string oscsPath = ofToDataPath(directoryName + "/____-46_137_90_x_22141.oscs");
@@ -14,9 +15,18 @@ FileClient::FileClient(std::string directoryName_)
     ofExit();
   }
 
-//  soundPlayer.setVolume(0);
+  soundPlayer.setVolume(soundPlayerVolume);
   soundPlayer.play();
   startTimeMs = ofGetElapsedTimeMillis();
+}
+
+bool FileClient::keyPressed(int key, int plotIndex) {
+  if (key == '`') {
+    soundPlayerVolume = 1.0 - soundPlayerVolume;
+    soundPlayer.setVolume(soundPlayerVolume);
+    return true;
+  }
+  return BaseClient::keyPressed(key, plotIndex);
 }
 
 int FileClient::nextOscPacket() {

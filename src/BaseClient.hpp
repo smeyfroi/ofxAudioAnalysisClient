@@ -31,7 +31,7 @@ public:
 
   virtual void update() { updateOsc(); };
   void drawPlots(float width, float height);
-  bool keyPressed(int key, int plotIndex);
+  virtual bool keyPressed(int key, int plotIndex);
 
 protected:
   static constexpr int MAX_PACKET_SIZE = 512;

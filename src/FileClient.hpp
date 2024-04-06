@@ -17,6 +17,8 @@ class FileClient : public BaseClient {
 public:
   FileClient(std::string directoryName_);
   std::ifstream oscsStream;
+  bool keyPressed(int key, int plotIndex) override;
+
 protected:
   int nextOscPacket() override;
 
@@ -25,6 +27,7 @@ private:
   ofSoundPlayer soundPlayer;
   uint64_t startTimeMs;
   uint64_t lastFrame;
+  float soundPlayerVolume;
 };
 
 } // namespace
