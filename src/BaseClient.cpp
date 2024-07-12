@@ -5,7 +5,9 @@
 
 namespace ofxAudioAnalysisClient {
 
-BaseClient::BaseClient() {
+BaseClient::BaseClient(bool darkMode_) :
+darkMode(darkMode_)
+{
   plots.resize(4);
   plotValueIndexes.resize(4);
   changePlot(0, static_cast<int>(AnalysisScalar::peakEnergy));
@@ -14,14 +16,20 @@ BaseClient::BaseClient() {
   changePlot(3, static_cast<int>(AnalysisScalar::pitch));
 }
 
-ofxHistoryPlot* makePlot(float* plottedValuePtr, std::string name, float low, float high) {
+ofxHistoryPlot* BaseClient::makePlot(float* plottedValuePtr, std::string name, float low, float high) {
   float numSamples = ofGetWindowWidth() / 2;
-  ofxHistoryPlot* plotPtr = new ofxHistoryPlot{plottedValuePtr, name, numSamples, true};
+  ofxHistoryPlot* plotPtr = new ofxHistoryPlot(plottedValuePtr, name, numSamples, true);
   if (low != 0.0 || high != 0.0) {
 //    plotPtr->setLowerRange(low);
     plotPtr->setRange(low, high);
   }
-  plotPtr->setColor(ofColor::white);
+  if (!darkMode) {
+    plotPtr->setColor(ofColor::black);
+    plotPtr->setBackgroundColor(ofColor(0, 0));
+    plotPtr->setGridColor(ofColor(240, 128));
+  } else {
+    plotPtr->setColor(ofColor::white);
+  }
   plotPtr->setShowNumericalInfo(true);
   plotPtr->setRespectBorders(true);
   plotPtr->setDrawFromRight(true);

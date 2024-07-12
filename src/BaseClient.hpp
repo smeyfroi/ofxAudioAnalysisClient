@@ -16,7 +16,7 @@ enum class AnalysisScalar {
 class BaseClient {
 
 public:
-  BaseClient();
+  BaseClient(bool darkMode = true);
   inline float getScalarValue(AnalysisScalar scalar) {
     return getScalarValue(static_cast<int>(scalar));
   };
@@ -41,6 +41,7 @@ protected:
 private:
   std::vector<std::unique_ptr<ofxHistoryPlot>> plots;
   std::vector<size_t> plotValueIndexes;
+  ofxHistoryPlot* makePlot(float* plottedValuePtr, std::string name, float low, float high);
   void resetPlots();
   void changePlot(size_t plotIndex, size_t valueIndex);
 
@@ -70,6 +71,7 @@ private:
   void updateOsc();
 
   bool plotsVisible;
+  bool darkMode;
 };
 
 } // namespace
