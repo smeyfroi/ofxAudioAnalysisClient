@@ -17,6 +17,7 @@ class BaseClient {
 
 public:
   BaseClient(bool darkMode = true);
+  virtual ~BaseClient() {};
   inline float getScalarValue(AnalysisScalar scalar) {
     return getScalarValue(static_cast<int>(scalar));
   };
@@ -56,9 +57,9 @@ private:
     0
   };
   std::array<float, static_cast<int>(AnalysisScalar::_count)> maxScalarValues {
-    10000, 10000, 30,
-    30, 50, 1, 1, 50,
-    50000000, 2000000, 2000000, 10000000, 20000000,
+    500, 5000, 25,
+    25, 50, 1, 0.5, 50,
+    500000, 20000, 20000, 20000, 1000000,
     4000
   };
   const std::array<std::string, static_cast<int>(AnalysisScalar::_count)> scalarNames {
