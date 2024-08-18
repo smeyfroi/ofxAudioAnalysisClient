@@ -50,6 +50,7 @@ private:
   std::vector<float> mfcc;
   //  std::vector<float> spectrum, mel;
 
+  // <<<<<<<<<<<<<<<< USED ONLY FOR PLOTTING
   std::array<float, static_cast<int>(AnalysisScalar::_count)> minScalarValues {
     0, 0, 0,
     0, 0, 0, 0, 0,
@@ -68,6 +69,7 @@ private:
     "Energy Difference", "Spectral Difference", "Spectral Difference HWR", "Complex Spectral Difference", "High Frequency Content",
     "Pitch"
   };
+  // >>>>>>>>>>>>>>>>> USED ONLY FOR PLOTTING
 
   void updateOsc();
 
