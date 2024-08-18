@@ -1,5 +1,9 @@
 #include "FileClient.hpp"
 
+#include "ofUtils.h"
+#include "ofLog.h"
+#include "ofAppRunner.h"
+
 namespace ofxAudioAnalysisClient {
 
 FileClient::FileClient(std::string directoryName_)
@@ -23,13 +27,13 @@ FileClient::FileClient(std::string directoryName_)
   startTimeMs = ofGetElapsedTimeMillis();
 }
 
-bool FileClient::keyPressed(int key, int plotIndex) {
+bool FileClient::keyPressed(int key) {
   if (key == '`') {
     soundPlayerVolume = 1.0 - soundPlayerVolume;
     soundPlayer.setVolume(soundPlayerVolume);
     return true;
   }
-  return BaseClient::keyPressed(key, plotIndex);
+  return BaseClient::keyPressed(key);
 }
 
 int FileClient::nextOscPacket() {

@@ -2,6 +2,7 @@
 
 #include "BaseClient.hpp"
 #include "ofxTCPClient.h"
+#include "ofSoundPlayer.h"
 
 namespace ofxAudioAnalysisClient {
 
@@ -17,7 +18,7 @@ class FileClient : public BaseClient {
 public:
   FileClient(std::string directoryName_);
   std::ifstream oscsStream;
-  bool keyPressed(int key, int plotIndex) override;
+  bool keyPressed(int key) override;
 
 protected:
   int nextOscPacket() override;

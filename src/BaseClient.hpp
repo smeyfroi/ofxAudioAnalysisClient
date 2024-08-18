@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ofxHistoryPlot.h"
+#include <array>
 
 namespace ofxAudioAnalysisClient {
 
@@ -16,7 +16,7 @@ enum class AnalysisScalar {
 class BaseClient {
 
 public:
-  BaseClient(bool darkMode = true);
+  BaseClient() {};
   virtual ~BaseClient() {};
   inline float getScalarValue(AnalysisScalar scalar) {
     return getScalarValue(static_cast<int>(scalar));
@@ -24,6 +24,9 @@ public:
   inline float getScalarValue(int scalarIndex) {
     return scalarValues[scalarIndex];
   };
+  inline float* getScalarValuePtr(int scalarIndex) {
+    return &scalarValues[scalarIndex];
+  }
   
   float frequencyToMidi(float freq) const;
   float getNoteFrequency() const;
@@ -31,8 +34,7 @@ public:
   const std::pair<float, float> getNote() const;
 
   virtual void update() { updateOsc(); };
-  void drawPlots(float width, float height);
-  virtual bool keyPressed(int key, int plotIndex);
+  virtual bool keyPressed(int key) { return false; };
 
 protected:
   static constexpr int MAX_PACKET_SIZE = 512;
@@ -40,41 +42,11 @@ protected:
   virtual int nextOscPacket() = 0;
 
 private:
-  std::vector<std::unique_ptr<ofxHistoryPlot>> plots;
-  std::vector<size_t> plotValueIndexes;
-  ofxHistoryPlot* makePlot(float* plottedValuePtr, std::string name, float low, float high);
-  void resetPlots();
-  void changePlot(size_t plotIndex, size_t valueIndex);
-
-  std::array<float, static_cast<int>(AnalysisScalar::_count)> scalarValues;
+  std::array<float, static_cast<int>(ofxAudioAnalysisClient::AnalysisScalar::_count)> scalarValues;
   std::vector<float> mfcc;
   //  std::vector<float> spectrum, mel;
 
-  // <<<<<<<<<<<<<<<< USED ONLY FOR PLOTTING
-  std::array<float, static_cast<int>(AnalysisScalar::_count)> minScalarValues {
-    0, 0, 0,
-    0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0,
-    0
-  };
-  std::array<float, static_cast<int>(AnalysisScalar::_count)> maxScalarValues {
-    500, 5000, 25,
-    25, 50, 1, 0.5, 50,
-    500000, 20000, 20000, 20000, 1000000,
-    4000
-  };
-  const std::array<std::string, static_cast<int>(AnalysisScalar::_count)> scalarNames {
-    "Root Mean Square", "Peak Energy", "Zero Crossing Rate",
-    "SpectralCentroid", "Spectral Crest", "Spectral Flatness", "Spectral Rollof", "Spectral Kurtosis",
-    "Energy Difference", "Spectral Difference", "Spectral Difference HWR", "Complex Spectral Difference", "High Frequency Content",
-    "Pitch"
-  };
-  // >>>>>>>>>>>>>>>>> USED ONLY FOR PLOTTING
-
   void updateOsc();
-
-  bool plotsVisible;
-  bool darkMode;
 };
 
 } // namespace
