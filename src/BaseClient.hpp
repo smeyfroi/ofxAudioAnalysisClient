@@ -27,6 +27,7 @@ public:
   inline float* getScalarValuePtr(int scalarIndex) {
     return &scalarValues[scalarIndex];
   }
+  inline auto& getMfcc() const { return mfcc; }
   
   float frequencyToMidi(float freq) const;
   float getNoteFrequency() const;

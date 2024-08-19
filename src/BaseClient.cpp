@@ -61,7 +61,7 @@ void BaseClient::updateOsc() {
 //    osc::ReceivedBundleElement element5 = *bundleIter++;
 //    osc::ReceivedMessage message5(element5);
 //    if (spectrum.size() != message5.ArgumentCount()) {
-//      if (spectrum.size() != 0) ofLogError() << "spectrum of size " << message5.ArgumentCount() << " != previous size size " << spectrum.size();
+//      if (spectrum.size() != 0) ofLogError() << "spectrum of size " << message5.ArgumentCount() << " != previous size " << spectrum.size();
 //      spectrum.resize(message5.ArgumentCount());
 //    }
 //    int i = 0;
@@ -72,7 +72,7 @@ void BaseClient::updateOsc() {
 //    osc::ReceivedBundleElement element6 = *bundleIter++;
 //    osc::ReceivedMessage message6(element6);
 //    if (mel.size() != message6.ArgumentCount()) {
-//      if (mel.size() != 0) ofLogError() << "mel of size " << message6.ArgumentCount() << " != previous size size " << mel.size();
+//      if (mel.size() != 0) ofLogError() << "mel of size " << message6.ArgumentCount() << " != previous size " << mel.size();
 //      mel.resize(message6.ArgumentCount());
 //    }
 //    i = 0;
@@ -83,12 +83,12 @@ void BaseClient::updateOsc() {
     osc::ReceivedBundleElement element7 = *bundleIter++;
     osc::ReceivedMessage message7(element7);
     if (mfcc.size() != message7.ArgumentCount()) {
-      if (mfcc.size() != 0) ofLogError() << "mfcc of size " << message7.ArgumentCount() << " != previous size size " << mfcc.size();
+      if (mfcc.size() != 0) ofLogError() << "mfcc of size " << message7.ArgumentCount() << " != previous size " << mfcc.size();
       mfcc.resize(message7.ArgumentCount());
     }
     int i = 0;
     for (auto iter = message7.ArgumentsBegin(); iter != message7.ArgumentsEnd(); iter++) {
-//      mfcc[i++] = (*iter).AsFloat();
+      mfcc[i++] = (*iter).AsFloat();
     }
 
     packetSize = nextOscPacket();
