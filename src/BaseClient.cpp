@@ -93,6 +93,8 @@ void BaseClient::updateOsc() {
 
     packetSize = nextOscPacket();
   } // while clearing backlog
+  
+  // TODO: detect end of stream so can report back
 }
 
 float BaseClient::frequencyToMidi(float freq) const {

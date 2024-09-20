@@ -16,7 +16,7 @@ inline int frameToOscsOffset(int frame) { return frame * OSC_FRAME_CHARS; };
 class FileClient : public BaseClient {
   
 public:
-  FileClient(std::string directoryName_);
+  FileClient(std::string wavPath, std::string oscPath);
   std::ifstream oscsStream;
   bool keyPressed(int key) override;
 
@@ -24,7 +24,7 @@ protected:
   int nextOscPacket() override;
 
 private:
-  std::string directoryName;
+  std::string wavPath, oscPath;
   ofSoundPlayer soundPlayer;
   uint64_t startTimeMs;
   uint64_t lastFrame;

@@ -6,16 +6,19 @@
 
 namespace ofxAudioAnalysisClient {
 
-FileClient::FileClient(std::string directoryName_)
-: directoryName(directoryName_),
+FileClient::FileClient(std::string wavPath_, std::string oscPath_)
+: wavPath(wavPath_),
+  oscPath(oscPath_),
   lastFrame(-1),
   soundPlayerVolume(0.0)
 {
   // TODO: Expand this whole plugin from one fixed voice to multiple channels
-//  soundPlayer.load(directoryName + "/____-80_41_155_x_22141-0-1.wav");
-//  std::string oscsPath = ofToDataPath(directoryName + "/____-80_41_155_x_22141.oscs");
-  soundPlayer.load(directoryName + "/____-46_137_90_x_22141-0-1.wav");
-  std::string oscsPath = ofToDataPath(directoryName + "/____-46_137_90_x_22141.oscs");
+  // bells
+  soundPlayer.load(wavPath);
+  std::string oscsPath = ofToDataPath(oscPath);
+  // nightsong
+//  soundPlayer.load(directoryName + "/____-46_137_90_x_22141-0-1.wav");
+//  std::string oscsPath = ofToDataPath(directoryName + "/____-46_137_90_x_22141.oscs");
   oscsStream = std::ifstream(oscsPath, std::ios::binary);
   if (!oscsStream.is_open()) {
     ofLogError() << "Failed to open " << oscsPath;
