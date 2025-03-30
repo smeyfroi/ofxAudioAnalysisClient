@@ -3,6 +3,13 @@
 #include <array>
 #include <vector>
 
+//Spectral Difference, derivate, shows the amount of change…effectively onset
+//Spectral Crest - How tonal the signal is, useful for distinguishing instuments
+//Spectral Centroid - Correlates to the brightness of the sound
+//Mel-frequency spectrum - Human perception FFT
+//Zero Crossing Rate - Sound brightness
+//Root mean square - Signal energy
+
 namespace ofxAudioAnalysisClient {
 
 // float scalars from the analysis
@@ -39,16 +46,17 @@ public:
   virtual bool keyPressed(int key) { return false; };
 
 protected:
-  static constexpr int MAX_PACKET_SIZE = 512;
-  char buf[MAX_PACKET_SIZE];
-  virtual int nextOscPacket() = 0;
+  static constexpr int MAX_PACKET_SIZE = 512; // refactor: this isn't used for LocalGistClient
+  char buf[MAX_PACKET_SIZE]; // refactor: this isn't used for LocalGistClient
+  virtual int nextOscPacket() = 0; // refactor: this isn't used for LocalGistClient
 
-private:
   std::array<float, static_cast<int>(ofxAudioAnalysisClient::AnalysisScalar::_count)> scalarValues;
   std::vector<float> mfcc;
   //  std::vector<float> spectrum, mel;
 
-  void updateOsc();
+  void updateOsc(); // rename: this isn't anything to do with OSC for LocalGistClient
+
+private:
 };
 
 } // namespace

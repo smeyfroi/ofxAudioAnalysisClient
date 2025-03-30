@@ -1,0 +1,9 @@
+ofxNetwork
+ofxOsc
+ofxHistoryPlot
+ofxAudioAnalysisClient
+ofxAudioData
+ofxAudioFile
+ofxGist
+ofxGui
+ofxSoundObjects
