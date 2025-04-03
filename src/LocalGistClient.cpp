@@ -3,22 +3,36 @@
 namespace ofxAudioAnalysisClient {
 
 // --- File input, device output
-//LocalGistClient::LocalGistClient(std::string wavPath_) {
-//  soundPlayer.load(wavPath_, false); // false to read the whole file; true to stream
-//  ofSoundStreamSettings settings;
-//  //  soundStream.printDeviceList();
-//  //  auto devices = soundStream.getDeviceList();
-//  //  if(!devices.empty()){
-//  //    settings.setInDevice(devices[0]);
-//  //  }
-//  settings.numOutputChannels = 1;
-//  settings.numInputChannels = 0;
-//  settings.sampleRate = soundPlayer.getSoundFile().getSampleRate();
-//  settings.bufferSize = 256; // device is 512?
-//  settings.numBuffers = 1; // 4
-//  settings.setInListener(this);
-//  soundStream.setup(settings);
-//}
+LocalGistClient::LocalGistClient(std::string _wavPath, int _bufferSize, int _nChannels,int _sampleRate) :
+  ofxSoundObject(OFX_SOUND_OBJECT_PROCESSOR),
+  wavPath(_wavPath),
+  bufferSize(_bufferSize),
+  nChannels(_nChannels),
+  sampleRate(_sampleRate)
+{
+  setupGist();
+  
+  soundPlayer.load(wavPath, false); // false to read the whole file; true to stream
+  
+  //  ofxSoundUtils::printOutputSoundDevices();
+  //  auto outDevices = ofxSoundUtils::getOutputSoundDevices();
+  //  int outDeviceIndex = 0;
+  //  cout << ofxSoundUtils::getSoundDeviceString(outDevices[outDeviceIndex], false, true) << endl;
+  
+  ofSoundStreamSettings settings;
+  settings.numInputChannels = nChannels;
+  settings.numOutputChannels = 2;
+  settings.sampleRate = soundPlayer.getSoundFile().getSampleRate();
+  settings.bufferSize = bufferSize; // 256
+  settings.numBuffers = 1;
+  soundStream.setup(settings);
+  soundStream.setOutput(deviceOutput);
+  
+  soundPlayer.connectTo(*this).connectTo(deviceOutput);
+  soundPlayer.play();
+//  soundPlayer.setLoop(true);
+  playerEndListener = soundPlayer.endEvent.newListener(this, &LocalGistClient::playerEnded);
+}
 
 // --- Device input, no output
 LocalGistClient::LocalGistClient(int _bufferSize, int _nChannels,int _sampleRate) :
@@ -28,7 +42,23 @@ LocalGistClient::LocalGistClient(int _bufferSize, int _nChannels,int _sampleRate
   sampleRate(_sampleRate)
 {
   setupGist();
-  setupInputDeviceSoundStream();
+  
+  //  ofxSoundUtils::printInputSoundDevices();
+  //  auto inDevices = ofxSoundUtils::getInputSoundDevices();
+  //  int inDeviceIndex = 0;
+  //  cout << ofxSoundUtils::getSoundDeviceString(inDevices[inDeviceIndex], false, true) << endl;
+
+  ofSoundStreamSettings settings;
+  settings.numInputChannels = nChannels;
+  settings.numOutputChannels = 1;
+  settings.sampleRate = sampleRate;
+  settings.bufferSize = bufferSize;
+  settings.numBuffers = 1; // 4
+  soundStream.setup(settings);
+  soundStream.setInput(deviceInput);
+  soundStream.setOutput(deviceOutput);
+  
+  deviceInput.connectTo(*this).connectTo(nullOutput);
 }
 
 void LocalGistClient::setupGist() {
@@ -40,25 +70,6 @@ void LocalGistClient::setupGist() {
       gist.setDetect(f);
     }
   }
-}
-
-void LocalGistClient::setupInputDeviceSoundStream() {
-  ofSoundStreamSettings settings;
-  //  soundStream.printDeviceList();
-  //  auto devices = soundStream.getDeviceList();
-  //  if(!devices.empty()){
-  //    settings.setInDevice(devices[0]);
-  //  }
-  settings.numOutputChannels = 1;
-  settings.numInputChannels = nChannels;
-  settings.sampleRate = sampleRate;
-  settings.bufferSize = bufferSize;
-  settings.numBuffers = 1; // 4
-  soundStream.setup(settings);
-  soundStream.setInput(deviceInput);
-  soundStream.setOutput(deviceOutput);
-  
-  deviceInput.connectTo(*this).connectTo(nullOutput);
 }
 
 void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
@@ -81,8 +92,32 @@ void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
   float pitchEstimate = gist.getValue(GIST_PITCH);
   if (pitchEstimate < 10000) scalarValues[static_cast<int>(AnalysisScalar::pitch)] = pitchEstimate;
   
+//  auto mfccs = gist.getMelFrequencyCepstralCoefficients();
+//  if (mfccs.size() != mfcc.size()) {
+//    if (mfcc.size() != 0) ofLogError() << "mfcc of size " << mfccs.size() << " != previous size " << mfcc.size();
+//    mfcc.resize(mfccs.size());
+//  }
+//  int i = 0;
+//  for (auto iter = message7.ArgumentsBegin(); iter != message7.ArgumentsEnd(); iter++) {
+//    mfcc[i++] = (*iter).AsFloat();
+//  }
+//
+//  for (auto iter = gist.getMelFrequencyCepstralCoefficients().begin(); iter !=
+  
   output = input;
 }
 
+void LocalGistClient::playerEnded(size_t &id) {
+  ofLogNotice() << "File stream ended";
+}
+
+bool LocalGistClient::keyPressed(int key) {
+  if (key == '`') {
+    soundPlayerVolume = 1.0 - soundPlayerVolume;
+    soundPlayer.setVolume(soundPlayerVolume);
+    return true;
+  }
+  return BaseClient::keyPressed(key);
+}
 
 }
