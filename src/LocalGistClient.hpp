@@ -26,6 +26,7 @@ public:
   bool keyPressed(int key) override;
 
 protected:
+  void updateHistory();
   int nextOscPacket() override { return 0; }; // need to refactor the base class away from being just an OSC client
   
 private:

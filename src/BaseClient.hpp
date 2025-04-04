@@ -2,6 +2,7 @@
 
 #include <array>
 #include <vector>
+#include <deque>
 
 //Spectral Difference, derivate, shows the amount of change…effectively onset
 //Spectral Crest - How tonal the signal is, useful for distinguishing instuments
@@ -42,7 +43,8 @@ public:
     return scalarValues[scalarIndex];
   };
   inline float* getScalarValuePtr(int scalarIndex) {
-    return &scalarValues[scalarIndex];
+    return &scalarValueMAs[scalarIndex];
+//    return &scalarValues[scalarIndex];
   }
   inline auto& getMfcc() const { return mfcc; }
   
@@ -59,9 +61,14 @@ protected:
   char buf[MAX_PACKET_SIZE]; // refactor: this isn't used for LocalGistClient
   virtual int nextOscPacket() = 0; // refactor: this isn't used for LocalGistClient
 
-  std::array<float, static_cast<int>(ofxAudioAnalysisClient::AnalysisScalar::_count)> scalarValues;
+  using scalarValuesT = std::array<float, static_cast<int>(AnalysisScalar::_count)>;
+  scalarValuesT scalarValues;
   std::vector<float> mfcc;
   //  std::vector<float> spectrum, mel;
+  
+  size_t scalarValuesHistoryLength = 32;
+  std::deque<std::shared_ptr<scalarValuesT>> scalarValuesHistory;
+  scalarValuesT scalarValueMAs;
 
   void updateOsc(); // rename: this isn't anything to do with OSC for LocalGistClient
 

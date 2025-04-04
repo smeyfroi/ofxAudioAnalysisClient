@@ -94,7 +94,7 @@ void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
   // SPECTRAL_DIFFERENCE_HALFWAY
 //  scalarValues[static_cast<int>(AnalysisScalar::highFrequencyContent)] = gist.getValue(GIST_HIGH_FREQUENCY_CONTENT);
   float pitchEstimate = gist.getValue(GIST_PITCH);
-  if (pitchEstimate < 10000) scalarValues[static_cast<int>(AnalysisScalar::pitch)] = pitchEstimate;
+  if (pitchEstimate < 5000.0 && pitchEstimate > 10.0) scalarValues[static_cast<int>(AnalysisScalar::pitch)] = pitchEstimate;
   
 //  auto mfccs = gist.getMelFrequencyCepstralCoefficients();
 //  if (mfccs.size() != mfcc.size()) {
@@ -108,8 +108,23 @@ void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
 //
 //  for (auto iter = gist.getMelFrequencyCepstralCoefficients().begin(); iter !=
   
+  updateHistory();
+  
   if (soundPlayerVolume > 0.0) {
     output = input;
+  }
+}
+
+void LocalGistClient::updateHistory() {
+  size_t historySize = scalarValuesHistory.size();
+  if (historySize > scalarValuesHistoryLength) scalarValuesHistory.pop_back();
+  scalarValuesHistory.push_front(make_shared<scalarValuesT>(scalarValues));
+  for (int i = 0; i < static_cast<int>(AnalysisScalar::_count); i++) {
+    float sum = 0.0;
+    for (const auto& values : scalarValuesHistory) {
+      sum += values->at(i);
+    }
+    scalarValueMAs[i] = sum / historySize;
   }
 }
 
