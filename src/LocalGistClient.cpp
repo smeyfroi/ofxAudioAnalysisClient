@@ -80,15 +80,15 @@ void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
   scalarValues[static_cast<int>(AnalysisScalar::zeroCrossingRate)] = gist.getValue(GIST_ZERO_CROSSING_RATE);
   scalarValues[static_cast<int>(AnalysisScalar::spectralCentroid)] = gist.getValue(GIST_SPECTRAL_CENTROID);
   scalarValues[static_cast<int>(AnalysisScalar::spectralCrest)] = gist.getValue(GIST_SPECTRAL_CREST);
-  scalarValues[static_cast<int>(AnalysisScalar::spectralFlatness)] = gist.getValue(GIST_SPECTRAL_FLATNESS);
+//  scalarValues[static_cast<int>(AnalysisScalar::spectralFlatness)] = gist.getValue(GIST_SPECTRAL_FLATNESS);
 //  scalarValues[static_cast<int>(AnalysisScalar::spectralRollof)] = gist.getValue(GIST_SPECTRAL_);
 //  scalarValues[static_cast<int>(AnalysisScalar::spectralKurtosis)] = gist.getValue(GIST_K);
 //  scalarValues[static_cast<int>(AnalysisScalar::energyDifference)] gist.getValue(GIST_);
   scalarValues[static_cast<int>(AnalysisScalar::spectralDifference)] = gist.getValue(GIST_SPECTRAL_DIFFERENCE);
 //  scalarValues[static_cast<int>(AnalysisScalar::spectralDifferenceHWR)] gist.getValue(GIST_SPEC);
-  scalarValues[static_cast<int>(AnalysisScalar::complexSpectralDifference)] = gist.getValue(GIST_SPECTRAL_DIFFERENCE_COMPLEX);
+//  scalarValues[static_cast<int>(AnalysisScalar::complexSpectralDifference)] = gist.getValue(GIST_SPECTRAL_DIFFERENCE_COMPLEX);
   // SPECTRAL_DIFFERENCE_HALFWAY
-  scalarValues[static_cast<int>(AnalysisScalar::highFrequencyContent)] = gist.getValue(GIST_HIGH_FREQUENCY_CONTENT);
+//  scalarValues[static_cast<int>(AnalysisScalar::highFrequencyContent)] = gist.getValue(GIST_HIGH_FREQUENCY_CONTENT);
   float pitchEstimate = gist.getValue(GIST_PITCH);
   if (pitchEstimate < 10000) scalarValues[static_cast<int>(AnalysisScalar::pitch)] = pitchEstimate;
   
@@ -104,7 +104,9 @@ void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
 //
 //  for (auto iter = gist.getMelFrequencyCepstralCoefficients().begin(); iter !=
   
-  output = input;
+  if (soundPlayerVolume > 0.0) {
+    output = input;
+  }
 }
 
 void LocalGistClient::playerEnded(size_t &id) {

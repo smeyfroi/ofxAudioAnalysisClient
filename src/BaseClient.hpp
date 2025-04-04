@@ -15,11 +15,18 @@ namespace ofxAudioAnalysisClient {
 // float scalars from the analysis
 enum class AnalysisScalar {
   rootMeanSquare, peakEnergy, zeroCrossingRate,
-  spectralCentroid, spectralCrest, spectralFlatness, spectralRollof, spectralKurtosis,
-  energyDifference, spectralDifference, spectralDifferenceHWR, complexSpectralDifference, highFrequencyContent,
+  spectralCentroid, spectralCrest,
+  energyDifference, spectralDifference,
   pitch,
   _count // index beyond final element
 };
+//enum class AnalysisScalar {
+//  rootMeanSquare, peakEnergy, zeroCrossingRate,
+//  spectralCentroid, spectralCrest, spectralFlatness, spectralRollof, spectralKurtosis,
+//  energyDifference, spectralDifference, spectralDifferenceHWR, complexSpectralDifference, highFrequencyContent,
+//  pitch,
+//  _count // index beyond final element
+//};
 
 class BaseClient {
 

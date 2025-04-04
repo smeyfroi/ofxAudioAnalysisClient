@@ -37,18 +37,18 @@ void BaseClient::updateOsc() {
     osc::ReceivedMessage::const_iterator messageIter2 = message2.ArgumentsBegin();
     scalarValues[static_cast<int>(AnalysisScalar::spectralCentroid)] = (*messageIter2++).AsFloat();
     scalarValues[static_cast<int>(AnalysisScalar::spectralCrest)] = (*messageIter2++).AsFloat();
-    scalarValues[static_cast<int>(AnalysisScalar::spectralFlatness)] = (*messageIter2++).AsFloat();
-    scalarValues[static_cast<int>(AnalysisScalar::spectralRollof)] = (*messageIter2++).AsFloat();
-    scalarValues[static_cast<int>(AnalysisScalar::spectralKurtosis)] = (*messageIter2++).AsFloat();
+//    scalarValues[static_cast<int>(AnalysisScalar::spectralFlatness)] = (*messageIter2++).AsFloat();
+//    scalarValues[static_cast<int>(AnalysisScalar::spectralRollof)] = (*messageIter2++).AsFloat();
+//    scalarValues[static_cast<int>(AnalysisScalar::spectralKurtosis)] = (*messageIter2++).AsFloat();
     // /onset
     osc::ReceivedBundleElement element3 = *bundleIter++;
     osc::ReceivedMessage message3(element3);
     osc::ReceivedMessage::const_iterator messageIter3 = message3.ArgumentsBegin();
     scalarValues[static_cast<int>(AnalysisScalar::energyDifference)] = (*messageIter3++).AsFloat();
     scalarValues[static_cast<int>(AnalysisScalar::spectralDifference)] = (*messageIter3++).AsFloat();
-    scalarValues[static_cast<int>(AnalysisScalar::spectralDifferenceHWR)] = (*messageIter3++).AsFloat();
-    scalarValues[static_cast<int>(AnalysisScalar::complexSpectralDifference)] = (*messageIter3++).AsFloat();
-    scalarValues[static_cast<int>(AnalysisScalar::highFrequencyContent)] = (*messageIter3++).AsFloat();
+//    scalarValues[static_cast<int>(AnalysisScalar::spectralDifferenceHWR)] = (*messageIter3++).AsFloat();
+//    scalarValues[static_cast<int>(AnalysisScalar::complexSpectralDifference)] = (*messageIter3++).AsFloat();
+//    scalarValues[static_cast<int>(AnalysisScalar::highFrequencyContent)] = (*messageIter3++).AsFloat();
     // /pitch
     osc::ReceivedBundleElement element4 = *bundleIter++;
     osc::ReceivedMessage message4(element4);
