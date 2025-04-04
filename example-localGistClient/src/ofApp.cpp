@@ -30,6 +30,11 @@ void ofApp::draw(){
 }
 
 //--------------------------------------------------------------
+void ofApp::exit(){
+  audioAnalysisClientPtr->closeStream();
+}
+
+//--------------------------------------------------------------
 void ofApp::keyPressed(int key){
   if (audioAnalysisClientPtr->keyPressed(key)) return;
 

@@ -72,6 +72,10 @@ void LocalGistClient::setupGist() {
   }
 }
 
+void LocalGistClient::closeStream() {
+  soundStream.close();
+}
+
 void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
   gist.processAudio(input.getBuffer(), bufferSize, nChannels, sampleRate);
 

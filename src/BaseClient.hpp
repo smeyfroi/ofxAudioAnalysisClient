@@ -33,6 +33,8 @@ class BaseClient {
 public:
   BaseClient() {};
   virtual ~BaseClient() {};
+  virtual void closeStream() {};
+  
   inline float getScalarValue(AnalysisScalar scalar) {
     return getScalarValue(static_cast<int>(scalar));
   };

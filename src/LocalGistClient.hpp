@@ -18,6 +18,8 @@ class LocalGistClient : public BaseClient, ofxSoundObject {
 public:
   LocalGistClient(int _bufferSize = 512, int _nChannels = 1,int _sampleRate = 44100); // defaults for Macbook builtin microphone
   LocalGistClient(std::string wavPath, int _bufferSize = 256, int _nChannels = 1,int _sampleRate = 48000); // defaults for saved Jamulus wav
+  void closeStream() override;
+
   void process(ofSoundBuffer &input, ofSoundBuffer &output) override; // ofxSoundObject
   void update() override {}; // from base class, but is done by process
   void playerEnded(size_t &id);
