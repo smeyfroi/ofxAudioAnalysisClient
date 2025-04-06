@@ -3,11 +3,12 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("violin.wav"));
+//  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("violin.wav"));
+//  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("trombone.wav"));
 //  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("Nightsong.wav"));
 //  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("Treganna.wav"));
 //  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("bells-descending-peal.wav"));
-//  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("violin-tune.wav"));
+  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("violin-tune.wav"));
 //  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>();
   audioDataProcessorPtr = std::make_shared<ofxAudioData::Processor>(audioAnalysisClientPtr);
   audioDataPlotsPtr = std::make_shared<ofxAudioData::Plots>(audioDataProcessorPtr);
@@ -20,26 +21,19 @@ void ofApp::update() {
   audioDataProcessorPtr->update();
   
   float s = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::pitch, 0.0, 1000.0);
-  float t = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::rootMeanSquare, 0.0, 0.1);
+  float t = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::rootMeanSquare, 0.0, 0.15);
+  float u = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::complexSpectralDifference, 0.0, 100.0);
+  float v = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::spectralCrest, 0.0, 100.0);
 
-  introspector.addCircle(s, t, 1.0/ofGetWindowWidth()*5.0, ofColor::yellow, true, 30); // introspection: small yellow circle for new raw source sample
+  introspector.addCircle(s, t, 1.0/ofGetWindowWidth()*5.0, ofColor::darkGreen, true, 30); // introspection: small yellow circle for new raw source sample
+  introspector.addLine(0.0, u, 1.0, u, ofColor::grey);
+  introspector.addLine(0.0, v, 1.0, v, ofColor::darkGreen);
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
   introspector.draw(ofGetWindowWidth());
-
-  // audio analysis graphs
-  {
-    ofPushStyle();
-    ofPushView();
-    ofEnableBlendMode(OF_BLENDMODE_ADD);
-    float plotHeight = ofGetWindowHeight() / 4.0;
-    audioDataPlotsPtr->drawPlots(ofGetWindowWidth(), plotHeight);
-    audioDataSpectrumPlotsPtr->draw();
-    ofPopView();
-    ofPopStyle();
-  }
+  audioDataPlotsPtr->drawPlots();
 }
 
 //--------------------------------------------------------------
