@@ -6,6 +6,13 @@
 
 namespace ofxAudioAnalysisClient {
 
+const std::array<std::string, AnalysisScalar::Value::_count> AnalysisScalar::names = {
+  "Root Mean Square", "Peak Energy", "Zero Crossing Rate",
+  "SpectralCentroid", "Spectral Crest",
+  "Energy Difference", "Spectral Difference", "Spectral Difference Complex",
+  "Pitch"
+};
+
 void BaseClient::updateOsc() {
   int packetSize = nextOscPacket();
   while (packetSize > 0) { // process any backlog
@@ -28,15 +35,15 @@ void BaseClient::updateOsc() {
     osc::ReceivedBundleElement element1 = *bundleIter++;
     osc::ReceivedMessage message1(element1);
     osc::ReceivedMessage::const_iterator messageIter1 = message1.ArgumentsBegin();
-    scalarValues[static_cast<int>(AnalysisScalar::rootMeanSquare)] = (*messageIter1++).AsFloat();
-    scalarValues[static_cast<int>(AnalysisScalar::peakEnergy)] = (*messageIter1++).AsFloat();
-    scalarValues[static_cast<int>(AnalysisScalar::zeroCrossingRate)] = (*messageIter1++).AsFloat();
+    scalarValues[AnalysisScalar::rootMeanSquare] = (*messageIter1++).AsFloat();
+    scalarValues[AnalysisScalar::peakEnergy] = (*messageIter1++).AsFloat();
+    scalarValues[AnalysisScalar::zeroCrossingRate] = (*messageIter1++).AsFloat();
     // /freq
     osc::ReceivedBundleElement element2 = *bundleIter++;
     osc::ReceivedMessage message2(element2);
     osc::ReceivedMessage::const_iterator messageIter2 = message2.ArgumentsBegin();
-    scalarValues[static_cast<int>(AnalysisScalar::spectralCentroid)] = (*messageIter2++).AsFloat();
-    scalarValues[static_cast<int>(AnalysisScalar::spectralCrest)] = (*messageIter2++).AsFloat();
+    scalarValues[AnalysisScalar::spectralCentroid] = (*messageIter2++).AsFloat();
+    scalarValues[AnalysisScalar::spectralCrest] = (*messageIter2++).AsFloat();
 //    scalarValues[static_cast<int>(AnalysisScalar::spectralFlatness)] = (*messageIter2++).AsFloat();
 //    scalarValues[static_cast<int>(AnalysisScalar::spectralRollof)] = (*messageIter2++).AsFloat();
 //    scalarValues[static_cast<int>(AnalysisScalar::spectralKurtosis)] = (*messageIter2++).AsFloat();
@@ -44,8 +51,8 @@ void BaseClient::updateOsc() {
     osc::ReceivedBundleElement element3 = *bundleIter++;
     osc::ReceivedMessage message3(element3);
     osc::ReceivedMessage::const_iterator messageIter3 = message3.ArgumentsBegin();
-    scalarValues[static_cast<int>(AnalysisScalar::energyDifference)] = (*messageIter3++).AsFloat();
-    scalarValues[static_cast<int>(AnalysisScalar::spectralDifference)] = (*messageIter3++).AsFloat();
+    scalarValues[AnalysisScalar::energyDifference] = (*messageIter3++).AsFloat();
+    scalarValues[AnalysisScalar::spectralDifference] = (*messageIter3++).AsFloat();
 //    scalarValues[static_cast<int>(AnalysisScalar::spectralDifferenceHWR)] = (*messageIter3++).AsFloat();
     messageIter3++;
     scalarValues[static_cast<int>(AnalysisScalar::complexSpectralDifference)] = (*messageIter3++).AsFloat();
@@ -55,8 +62,8 @@ void BaseClient::updateOsc() {
     osc::ReceivedMessage message4(element4);
     osc::ReceivedMessage::const_iterator messageIter4 = message4.ArgumentsBegin();
     float pitchEstimate = (*messageIter4++).AsFloat();
-    if (pitchEstimate < 10000) {
-      scalarValues[static_cast<int>(AnalysisScalar::pitch)] = pitchEstimate;
+    if (pitchEstimate < 2000) {
+      scalarValues[AnalysisScalar::pitch] = pitchEstimate;
     }
     // /spectrum
 //    osc::ReceivedBundleElement element5 = *bundleIter++;
@@ -111,7 +118,7 @@ float BaseClient::frequencyToMidi(float freq) const {
 
 float BaseClient::getNoteFrequency() const {
 //  if(_doDetect[GIST_PITCH] ){
-      return frequencyToMidi(scalarValues[static_cast<int>(AnalysisScalar::pitch)]);
+      return frequencyToMidi(scalarValues[AnalysisScalar::pitch]);
 //  }
 };
 

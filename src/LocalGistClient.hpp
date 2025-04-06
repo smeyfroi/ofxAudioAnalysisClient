@@ -41,7 +41,7 @@ private:
   
   ofxSoundPlayerObject soundPlayer; //file
   ofEventListener playerEndListener;
-  float soundPlayerVolume;
+  float soundPlayerVolume = 1.0;
   
   ofxGist gist;
   int bufferSize, nChannels, sampleRate;

@@ -14,12 +14,25 @@
 namespace ofxAudioAnalysisClient {
 
 // float scalars from the analysis
-enum class AnalysisScalar {
-  rootMeanSquare, peakEnergy, zeroCrossingRate,
-  spectralCentroid, spectralCrest,
-  energyDifference, spectralDifference, complexSpectralDifference,
-  pitch,
-  _count // index beyond final element
+class AnalysisScalar {
+public:
+  enum Value : uint8_t {
+    rootMeanSquare, peakEnergy, zeroCrossingRate,
+    spectralCentroid, spectralCrest,
+    energyDifference, spectralDifference, complexSpectralDifference,
+    pitch,
+    _count // index beyond final element
+  };
+  static const std::array<std::string, _count> names;
+  
+  AnalysisScalar() = default;
+  constexpr AnalysisScalar(Value value_) : value { value_ } {};
+  constexpr operator Value() const { return value; }
+  static constexpr AnalysisScalar next(AnalysisScalar s) { return AnalysisScalar(static_cast<Value>((s.value+1) % _count)); }
+  static constexpr AnalysisScalar previous(AnalysisScalar s) { return AnalysisScalar(static_cast<Value>((s.value-1+_count) % _count)); }
+  static const std::string name(AnalysisScalar s) { return names[s.value]; }
+private:
+  Value value;
 };
 //enum class AnalysisScalar {
 //  rootMeanSquare, peakEnergy, zeroCrossingRate,
@@ -37,14 +50,10 @@ public:
   virtual void closeStream() {};
   
   inline float getScalarValue(AnalysisScalar scalar) {
-    return getScalarValue(static_cast<int>(scalar));
+    return scalarValues[scalar];
   };
-  inline float getScalarValue(int scalarIndex) {
-    return scalarValues[scalarIndex];
-  };
-  inline float* getScalarValuePtr(int scalarIndex) {
-    return &scalarValueMAs[scalarIndex];
-//    return &scalarValues[scalarIndex];
+  inline float* getScalarValuePtr(AnalysisScalar scalar) {
+    return &scalarValueMAs[scalar];
   }
   inline auto& getMfcc() const { return mfcc; }
   
