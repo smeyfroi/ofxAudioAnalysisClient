@@ -34,13 +34,6 @@ public:
 private:
   Value value;
 };
-//enum class AnalysisScalar {
-//  rootMeanSquare, peakEnergy, zeroCrossingRate,
-//  spectralCentroid, spectralCrest, spectralFlatness, spectralRollof, spectralKurtosis,
-//  energyDifference, spectralDifference, spectralDifferenceHWR, complexSpectralDifference, highFrequencyContent,
-//  pitch,
-//  _count // index beyond final element
-//};
 
 class BaseClient {
 

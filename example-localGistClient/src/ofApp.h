@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxAudioAnalysisClient.h"
 #include "ofxAudioData.h"
+#include "ofxIntrospector.h"
 
 class ofApp: public ofBaseApp{
 public:
@@ -26,4 +27,7 @@ private:
   std::shared_ptr<ofxAudioData::Processor> audioDataProcessorPtr;
   std::shared_ptr<ofxAudioData::Plots> audioDataPlotsPtr;
   std::shared_ptr<ofxAudioData::SpectrumPlots> audioDataSpectrumPlotsPtr;
+  
+  Introspector introspector;
+
 };

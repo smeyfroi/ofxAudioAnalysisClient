@@ -3,23 +3,32 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-//  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("violin.wav"));
+  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("violin.wav"));
 //  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("Nightsong.wav"));
 //  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("Treganna.wav"));
 //  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("bells-descending-peal.wav"));
-  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("violin-tune.wav"));
+//  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("violin-tune.wav"));
+//  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>();
   audioDataProcessorPtr = std::make_shared<ofxAudioData::Processor>(audioAnalysisClientPtr);
   audioDataPlotsPtr = std::make_shared<ofxAudioData::Plots>(audioDataProcessorPtr);
   audioDataSpectrumPlotsPtr = std::make_shared<ofxAudioData::SpectrumPlots>(audioDataProcessorPtr);
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
+void ofApp::update() {
+  introspector.update();
   audioDataProcessorPtr->update();
+  
+  float s = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::pitch, 0.0, 1000.0);
+  float t = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::rootMeanSquare, 0.0, 0.1);
+
+  introspector.addCircle(s, t, 1.0/ofGetWindowWidth()*5.0, ofColor::yellow, true, 30); // introspection: small yellow circle for new raw source sample
 }
 
 //--------------------------------------------------------------
-void ofApp::draw(){
+void ofApp::draw() {
+  introspector.draw(ofGetWindowWidth());
+
   // audio analysis graphs
   {
     ofPushStyle();
@@ -41,6 +50,7 @@ void ofApp::exit(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
   if (audioAnalysisClientPtr->keyPressed(key)) return;
+  if (introspector.keyPressed(key)) return;
 
   {
     float plotHeight = ofGetWindowHeight() / 4.0;

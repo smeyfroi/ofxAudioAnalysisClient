@@ -13,12 +13,8 @@ FileClient::FileClient(std::string wavPath_, std::string oscPath_)
   soundPlayerVolume(0.0)
 {
   // TODO: Expand this whole plugin from one fixed voice to multiple channels
-  // bells
   soundPlayer.load(wavPath);
   std::string oscsPath = ofToDataPath(oscPath);
-  // nightsong
-//  soundPlayer.load(directoryName + "/____-46_137_90_x_22141-0-1.wav");
-//  std::string oscsPath = ofToDataPath(directoryName + "/____-46_137_90_x_22141.oscs");
   oscsStream = std::ifstream(oscsPath, std::ios::binary);
   if (!oscsStream.is_open()) {
     ofLogError() << "Failed to open " << oscsPath;
