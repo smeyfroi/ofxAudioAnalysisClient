@@ -30,7 +30,7 @@ LocalGistClient::LocalGistClient(std::string _wavPath, int _bufferSize, int _nCh
   
   soundPlayer.connectTo(*this).connectTo(deviceOutput);
   soundPlayer.play();
-//  soundPlayer.setLoop(true);
+  soundPlayer.setLoop(true);
   playerEndListener = soundPlayer.endEvent.newListener(this, &LocalGistClient::playerEnded);
 }
 
@@ -63,7 +63,13 @@ LocalGistClient::LocalGistClient(int _bufferSize, int _nChannels,int _sampleRate
 
 void LocalGistClient::setupGist() {
   {
-    vector<string> features = ofxGist::getFeatureNames();
+//    vector<string> features = ofxGist::getFeatureNames();
+    const static vector<string> features {
+      "GIST_ROOT_MEAN_SQUARE", "GIST_PEAK_ENERGY", "GIST_ZERO_CROSSING_RATE",
+      "GIST_SPECTRAL_CENTROID", "GIST_SPECTRAL_CREST",
+      "GIST_SPECTRAL_DIFFERENCE", "GIST_SPECTRAL_DIFFERENCE_COMPLEX",
+      "GIST_PITCH"
+    };
     int num = features.size();
     for(int v=0; v<num; v++) {
       GIST_FEATURE f = ofxGist::getFeatureFromName(features[v]);
@@ -90,7 +96,7 @@ void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
 //  scalarValues[static_cast<int>(AnalysisScalar::energyDifference)] gist.getValue(GIST_);
   scalarValues[static_cast<int>(AnalysisScalar::spectralDifference)] = gist.getValue(GIST_SPECTRAL_DIFFERENCE);
 //  scalarValues[static_cast<int>(AnalysisScalar::spectralDifferenceHWR)] gist.getValue(GIST_SPEC);
-//  scalarValues[static_cast<int>(AnalysisScalar::complexSpectralDifference)] = gist.getValue(GIST_SPECTRAL_DIFFERENCE_COMPLEX);
+  scalarValues[static_cast<int>(AnalysisScalar::complexSpectralDifference)] = gist.getValue(GIST_SPECTRAL_DIFFERENCE_COMPLEX);
   // SPECTRAL_DIFFERENCE_HALFWAY
 //  scalarValues[static_cast<int>(AnalysisScalar::highFrequencyContent)] = gist.getValue(GIST_HIGH_FREQUENCY_CONTENT);
   float pitchEstimate = gist.getValue(GIST_PITCH);
