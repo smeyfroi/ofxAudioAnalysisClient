@@ -1,9 +1,10 @@
 ofxNetwork
 ofxOsc
 ofxHistoryPlot
-ofxAudioAnalysisClient
-ofxAudioData
-ofxAudioFile
 ofxGist
+ofxAudioFile
 ofxGui
 ofxSoundObjects
+ofxAudioAnalysisClient
+ofxAudioData
+ofxIntrospector
