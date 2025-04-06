@@ -17,7 +17,7 @@ namespace ofxAudioAnalysisClient {
 enum class AnalysisScalar {
   rootMeanSquare, peakEnergy, zeroCrossingRate,
   spectralCentroid, spectralCrest,
-  energyDifference, spectralDifference,
+  energyDifference, spectralDifference, complexSpectralDifference,
   pitch,
   _count // index beyond final element
 };

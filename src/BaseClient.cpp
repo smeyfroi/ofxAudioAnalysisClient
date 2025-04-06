@@ -47,7 +47,8 @@ void BaseClient::updateOsc() {
     scalarValues[static_cast<int>(AnalysisScalar::energyDifference)] = (*messageIter3++).AsFloat();
     scalarValues[static_cast<int>(AnalysisScalar::spectralDifference)] = (*messageIter3++).AsFloat();
 //    scalarValues[static_cast<int>(AnalysisScalar::spectralDifferenceHWR)] = (*messageIter3++).AsFloat();
-//    scalarValues[static_cast<int>(AnalysisScalar::complexSpectralDifference)] = (*messageIter3++).AsFloat();
+    messageIter3++;
+    scalarValues[static_cast<int>(AnalysisScalar::complexSpectralDifference)] = (*messageIter3++).AsFloat();
 //    scalarValues[static_cast<int>(AnalysisScalar::highFrequencyContent)] = (*messageIter3++).AsFloat();
     // /pitch
     osc::ReceivedBundleElement element4 = *bundleIter++;
