@@ -107,8 +107,6 @@ void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
 //
 //  for (auto iter = gist.getMelFrequencyCepstralCoefficients().begin(); iter !=
   
-  updateHistory();
-  
   if (soundPlayerVolume > 0.0) {
     output = input;
   }

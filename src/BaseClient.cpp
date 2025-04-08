@@ -100,19 +100,6 @@ void BaseClient::updateOsc() {
   // TODO: detect end of stream so can report back
 }
 
-void BaseClient::updateHistory() {
-  size_t historySize = scalarValuesHistory.size();
-  if (historySize > scalarValuesHistoryLength) scalarValuesHistory.pop_back();
-  scalarValuesHistory.push_front(std::make_shared<scalarValuesT>(scalarValues));
-  for (int i = 0; i < static_cast<int>(AnalysisScalar::_count); i++) {
-    float sum = 0.0;
-    for (const auto& values : scalarValuesHistory) {
-      sum += values->at(i);
-    }
-    scalarValueMAs[i] = sum / historySize;
-  }
-}
-
 float BaseClient::frequencyToMidi(float freq) const {
     float midi;
     if (freq < 2. || freq > 100000.) return 0.; // avoid nans and infs

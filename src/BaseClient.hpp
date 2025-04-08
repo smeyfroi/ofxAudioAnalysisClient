@@ -2,7 +2,6 @@
 
 #include <array>
 #include <vector>
-#include <deque>
 
 //Spectral Difference, derivate, shows the amount of change…effectively onset
 //Spectral Crest - How tonal the signal is, useful for distinguishing instuments
@@ -43,20 +42,17 @@ public:
   virtual ~BaseClient() {};
   virtual void closeStream() {};
   
-  inline float getScalarValue(AnalysisScalar scalar) {
-    return scalarValues[scalar];
-  };
-  inline float* getScalarValuePtr(AnalysisScalar scalar) {
-    return &scalarValueMAs[scalar];
-  }
-  inline auto& getMfcc() const { return mfcc; }
+  const auto& getScalarValues() { return scalarValues; };
+  float getScalarValue(AnalysisScalar scalar) { return scalarValues[scalar]; };
+  float* getScalarValuePtr(AnalysisScalar scalar) { return &scalarValues[scalar]; }
+  auto& getMfcc() const { return mfcc; }
   
   float frequencyToMidi(float freq) const;
   float getNoteFrequency() const;
   const std::string getNoteName() const;
   const std::pair<float, float> getNote() const;
 
-  virtual void update() { updateOsc(); updateHistory(); };
+  virtual void update() { updateOsc(); };
   virtual bool keyPressed(int key) { return false; };
 
 protected:
@@ -68,13 +64,7 @@ protected:
   std::vector<float> mfcc;
   //  std::vector<float> spectrum, mel;
   
-  size_t scalarValuesHistoryLength = 32;
-  std::deque<std::shared_ptr<scalarValuesT>> scalarValuesHistory;
-  scalarValuesT scalarValueMAs;
-
   void updateOsc(); // rename: this isn't anything to do with OSC for LocalGistClient
-  
-  void updateHistory();
 
 private:
 };
