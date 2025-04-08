@@ -12,7 +12,6 @@ void ofApp::setup(){
 //  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>();
   audioDataProcessorPtr = std::make_shared<ofxAudioData::Processor>(audioAnalysisClientPtr);
   audioDataPlotsPtr = std::make_shared<ofxAudioData::Plots>(audioDataProcessorPtr);
-  audioDataSpectrumPlotsPtr = std::make_shared<ofxAudioData::SpectrumPlots>(audioDataProcessorPtr);
 }
 
 //--------------------------------------------------------------
@@ -45,14 +44,7 @@ void ofApp::exit(){
 void ofApp::keyPressed(int key){
   if (audioAnalysisClientPtr->keyPressed(key)) return;
   if (introspector.keyPressed(key)) return;
-
-  {
-    float plotHeight = ofGetWindowHeight() / 4.0;
-    int plotIndex = ofGetMouseY() / plotHeight;
-    bool plotKeyPressed = audioDataPlotsPtr->keyPressed(key, plotIndex);
-    bool spectrumPlotKeyPressed = audioDataSpectrumPlotsPtr->keyPressed(key);
-    if (plotKeyPressed || spectrumPlotKeyPressed) return;
-  }
+  if (audioDataPlotsPtr->keyPressed(key)) return;
 }
 
 //--------------------------------------------------------------

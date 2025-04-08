@@ -25,9 +25,7 @@ public:
 private:
   std::shared_ptr<ofxAudioAnalysisClient::LocalGistClient> audioAnalysisClientPtr;
   std::shared_ptr<ofxAudioData::Processor> audioDataProcessorPtr;
-  std::shared_ptr<ofxAudioData::Plots> audioDataPlotsPtr;
-  std::shared_ptr<ofxAudioData::SpectrumPlots> audioDataSpectrumPlotsPtr;
-  
+  std::shared_ptr<ofxAudioData::Plots> audioDataPlotsPtr;  
   Introspector introspector;
 
 };
