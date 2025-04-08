@@ -35,8 +35,9 @@ private:
   Value value;
 };
 
-class BaseClient {
+using scalarValuesT = std::array<float, static_cast<int>(AnalysisScalar::_count)>;
 
+class BaseClient {
 public:
   BaseClient() {};
   virtual ~BaseClient() {};
@@ -55,7 +56,7 @@ public:
   const std::string getNoteName() const;
   const std::pair<float, float> getNote() const;
 
-  virtual void update() { updateOsc(); };
+  virtual void update() { updateOsc(); updateHistory(); };
   virtual bool keyPressed(int key) { return false; };
 
 protected:
@@ -63,7 +64,6 @@ protected:
   char buf[MAX_PACKET_SIZE]; // refactor: this isn't used for LocalGistClient
   virtual int nextOscPacket() = 0; // refactor: this isn't used for LocalGistClient
 
-  using scalarValuesT = std::array<float, static_cast<int>(AnalysisScalar::_count)>;
   scalarValuesT scalarValues;
   std::vector<float> mfcc;
   //  std::vector<float> spectrum, mel;
@@ -73,6 +73,8 @@ protected:
   scalarValuesT scalarValueMAs;
 
   void updateOsc(); // rename: this isn't anything to do with OSC for LocalGistClient
+  
+  void updateHistory();
 
 private:
 };

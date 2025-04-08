@@ -114,19 +114,6 @@ void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
   }
 }
 
-void LocalGistClient::updateHistory() {
-  size_t historySize = scalarValuesHistory.size();
-  if (historySize > scalarValuesHistoryLength) scalarValuesHistory.pop_back();
-  scalarValuesHistory.push_front(make_shared<scalarValuesT>(scalarValues));
-  for (int i = 0; i < static_cast<int>(AnalysisScalar::_count); i++) {
-    float sum = 0.0;
-    for (const auto& values : scalarValuesHistory) {
-      sum += values->at(i);
-    }
-    scalarValueMAs[i] = sum / historySize;
-  }
-}
-
 void LocalGistClient::playerEnded(size_t &id) {
   ofLogNotice() << "File stream ended";
 }

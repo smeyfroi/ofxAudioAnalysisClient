@@ -22,17 +22,17 @@ public:
 
   void process(ofSoundBuffer &input, ofSoundBuffer &output) override; // ofxSoundObject
   void update() override {}; // from base class, but is done by process
+  
   void playerEnded(size_t &id);
   bool keyPressed(int key) override;
 
 protected:
-  void updateHistory();
   int nextOscPacket() override { return 0; }; // need to refactor the base class away from being just an OSC client
   
 private:
   void setupGist();
 
-    std::string wavPath;
+  std::string wavPath;
   
   ofxSoundInput deviceInput;
   ofxSoundOutput deviceOutput;
