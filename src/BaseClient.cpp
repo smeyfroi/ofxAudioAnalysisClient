@@ -6,6 +6,7 @@
 
 namespace ofxAudioAnalysisClient {
 
+// Match the Value enum in header
 const std::array<std::string, AnalysisScalar::Value::_count> AnalysisScalar::names = {
   "Root Mean Square", "Peak Energy", "Zero Crossing Rate",
   "SpectralCentroid", "Spectral Crest",
