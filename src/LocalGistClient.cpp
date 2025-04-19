@@ -3,7 +3,7 @@
 namespace ofxAudioAnalysisClient {
 
 // --- File input, device output
-LocalGistClient::LocalGistClient(std::string _wavPath, int _bufferSize, int _nChannels,int _sampleRate) :
+LocalGistClient::LocalGistClient(std::string _wavPath, int _bufferSize, int _nChannels, int _sampleRate) :
   ofxSoundObject(OFX_SOUND_OBJECT_PROCESSOR),
   wavPath(_wavPath),
   bufferSize(_bufferSize),
@@ -14,10 +14,10 @@ LocalGistClient::LocalGistClient(std::string _wavPath, int _bufferSize, int _nCh
   
   soundPlayer.load(wavPath, false); // false to read the whole file; true to stream
   
-  //  ofxSoundUtils::printOutputSoundDevices();
-  //  auto outDevices = ofxSoundUtils::getOutputSoundDevices();
-  //  int outDeviceIndex = 0;
-  //  cout << ofxSoundUtils::getSoundDeviceString(outDevices[outDeviceIndex], false, true) << endl;
+  ofxSoundUtils::printOutputSoundDevices();
+  auto outDevices = ofxSoundUtils::getOutputSoundDevices();
+  int outDeviceIndex = 0;
+  cout << ofxSoundUtils::getSoundDeviceString(outDevices[outDeviceIndex], false, true) << endl;
   
   ofSoundStreamSettings settings;
   settings.numInputChannels = nChannels;
@@ -35,19 +35,26 @@ LocalGistClient::LocalGistClient(std::string _wavPath, int _bufferSize, int _nCh
 }
 
 // --- Device input, no output
-LocalGistClient::LocalGistClient(int _bufferSize, int _nChannels,int _sampleRate) :
-  ofxSoundObject(OFX_SOUND_OBJECT_PROCESSOR),
-  bufferSize(_bufferSize),
-  nChannels(_nChannels),
-  sampleRate(_sampleRate)
+LocalGistClient::LocalGistClient() :
+  ofxSoundObject(OFX_SOUND_OBJECT_PROCESSOR)
 {
   setupGist();
   
-  //  ofxSoundUtils::printInputSoundDevices();
-  //  auto inDevices = ofxSoundUtils::getInputSoundDevices();
-  //  int inDeviceIndex = 0;
-  //  cout << ofxSoundUtils::getSoundDeviceString(inDevices[inDeviceIndex], false, true) << endl;
-
+  ofxSoundUtils::printInputSoundDevices();
+  ofxSoundUtils::printOutputSoundDevices();
+  
+//  auto inDevices = ofxSoundUtils::getInputSoundDevices();
+//  auto outDevices = ofxSoundUtils::getOutputSoundDevices();
+//  
+//  size_t inDeviceIndex = 2;
+//  size_t outDeviceIndex = 3;
+//  ofLogNotice() << ofToString(inDevices[inDeviceIndex].sampleRates);
+//
+//  nChannels = inDevices[inDeviceIndex].inputChannels;
+  nChannels = 1;
+  bufferSize = 256;
+  sampleRate = 44100;
+  
   ofSoundStreamSettings settings;
   settings.numInputChannels = nChannels;
   settings.numOutputChannels = 1;
@@ -56,8 +63,8 @@ LocalGistClient::LocalGistClient(int _bufferSize, int _nChannels,int _sampleRate
   settings.numBuffers = 1; // 4
   soundStream.setup(settings);
   soundStream.setInput(deviceInput);
-  soundStream.setOutput(deviceOutput);
-  
+  soundStream.setOutput(nullOutput);
+
   deviceInput.connectTo(*this).connectTo(nullOutput);
 }
 
@@ -71,7 +78,7 @@ void LocalGistClient::setupGist() {
       "GIST_PITCH"
     };
     int num = features.size();
-    for(int v=0; v<num; v++) {
+    for(int v = 0; v < num; v++) {
       GIST_FEATURE f = ofxGist::getFeatureFromName(features[v]);
       gist.setDetect(f);
     }
@@ -91,7 +98,7 @@ void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
   scalarValues[AnalysisScalar::spectralCentroid] = gist.getValue(GIST_SPECTRAL_CENTROID);
   scalarValues[AnalysisScalar::spectralCrest] = gist.getValue(GIST_SPECTRAL_CREST);
   scalarValues[AnalysisScalar::spectralDifference] = gist.getValue(GIST_SPECTRAL_DIFFERENCE);
-  scalarValues[static_cast<int>(AnalysisScalar::complexSpectralDifference)] = gist.getValue(GIST_SPECTRAL_DIFFERENCE_COMPLEX);
+  scalarValues[AnalysisScalar::complexSpectralDifference] = gist.getValue(GIST_SPECTRAL_DIFFERENCE_COMPLEX);
   float pitchEstimate = gist.getValue(GIST_PITCH);
   if (pitchEstimate < 5000.0 && pitchEstimate > 10.0) scalarValues[AnalysisScalar::pitch] = pitchEstimate;
   

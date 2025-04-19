@@ -16,7 +16,7 @@ class NullOutput : public ofxSoundOutput {
 class LocalGistClient : public BaseClient, ofxSoundObject {
   
 public:
-  LocalGistClient(int _bufferSize = 512, int _nChannels = 1,int _sampleRate = 44100); // defaults for Macbook builtin microphone
+  LocalGistClient(); // default sound input device
   LocalGistClient(std::string wavPath, int _bufferSize = 256, int _nChannels = 1,int _sampleRate = 48000); // defaults for saved Jamulus wav
   void closeStream() override;
 
@@ -36,7 +36,7 @@ private:
   
   ofxSoundInput deviceInput;
   ofxSoundOutput deviceOutput;
-  ofxSoundOutput nullOutput;
+  NullOutput nullOutput;
   ofSoundStream soundStream;
   
   ofxSoundPlayerObject soundPlayer; //file
