@@ -18,7 +18,7 @@ public:
   enum Value : uint8_t {
     rootMeanSquare, peakEnergy, zeroCrossingRate,
     spectralCentroid, spectralCrest,
-    energyDifference, spectralDifference, complexSpectralDifference,
+    spectralDifference, complexSpectralDifference,
     pitch,
     _count // index beyond final element
   };

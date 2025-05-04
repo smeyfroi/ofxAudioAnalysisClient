@@ -4,6 +4,7 @@
 #include "ofxAudioAnalysisClient.h"
 #include "ofxAudioData.h"
 #include "ofxIntrospector.h"
+#include "ofxGui.h"
 
 class ofApp: public ofBaseApp{
 public:
@@ -28,4 +29,6 @@ private:
   std::shared_ptr<ofxAudioData::Plots> audioDataPlotsPtr;  
   Introspector introspector;
 
+  ofxPanel gui;
+  ofParameterGroup parameters;
 };

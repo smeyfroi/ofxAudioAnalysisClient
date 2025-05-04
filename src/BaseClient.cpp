@@ -10,7 +10,7 @@ namespace ofxAudioAnalysisClient {
 const std::array<std::string, AnalysisScalar::Value::_count> AnalysisScalar::names = {
   "Root Mean Square", "Peak Energy", "Zero Crossing Rate",
   "SpectralCentroid", "Spectral Crest",
-  "Energy Difference", "Spectral Difference", "Spectral Difference Complex",
+  "Spectral Difference", "Spectral Difference Complex",
   "Pitch"
 };
 
@@ -49,7 +49,6 @@ void BaseClient::updateOsc() {
     osc::ReceivedBundleElement element3 = *bundleIter++;
     osc::ReceivedMessage message3(element3);
     osc::ReceivedMessage::const_iterator messageIter3 = message3.ArgumentsBegin();
-    scalarValues[AnalysisScalar::energyDifference] = (*messageIter3++).AsFloat();
     scalarValues[AnalysisScalar::spectralDifference] = (*messageIter3++).AsFloat();
     messageIter3++;
     scalarValues[static_cast<int>(AnalysisScalar::complexSpectralDifference)] = (*messageIter3++).AsFloat();
