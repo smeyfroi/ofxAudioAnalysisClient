@@ -39,18 +39,19 @@ LocalGistClient::LocalGistClient() :
   ofxSoundObject(OFX_SOUND_OBJECT_PROCESSOR)
 {
   setupGist();
-  
+    
   ofxSoundUtils::printInputSoundDevices();
-  ofxSoundUtils::printOutputSoundDevices();
-  
 //  auto inDevices = ofxSoundUtils::getInputSoundDevices();
-//  auto outDevices = ofxSoundUtils::getOutputSoundDevices();
-//  
 //  size_t inDeviceIndex = 2;
+//  auto& inDevice =  inDevices[inDeviceIndex];
+//  ofLogNotice() << "Using inDevice " << inDevice.name;
+//  nChannels = inDevice.inputChannels;
+  //  ofLogNotice() << ofToString(inDevices[inDeviceIndex].sampleRates);
+
+//  ofxSoundUtils::printOutputSoundDevices();
+//  auto outDevices = ofxSoundUtils::getOutputSoundDevices();
 //  size_t outDeviceIndex = 3;
-//  ofLogNotice() << ofToString(inDevices[inDeviceIndex].sampleRates);
-//
-//  nChannels = inDevices[inDeviceIndex].inputChannels;
+
   nChannels = 1;
   bufferSize = 256;
   sampleRate = 44100;
@@ -61,6 +62,7 @@ LocalGistClient::LocalGistClient() :
   settings.sampleRate = sampleRate;
   settings.bufferSize = bufferSize;
   settings.numBuffers = 1; // 4
+//  settings.setInDevice(inDevice);
   soundStream.setup(settings);
   soundStream.setInput(deviceInput);
   soundStream.setOutput(nullOutput);
