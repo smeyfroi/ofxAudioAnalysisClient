@@ -6,18 +6,17 @@
 #include "ofxGist.h"
 #include "ofxOsc.h"
 #include "ofxSoundObjects.h"
+#include "ofxSoundRecorderObject.h"
+#include "NullOutput.h"
 
 namespace ofxAudioAnalysisClient {
-
-class NullOutput : public ofxSoundOutput {
-  void process(ofSoundBuffer &input, ofSoundBuffer &output) override {};
-};
 
 class LocalGistClient : public BaseClient, ofxSoundObject {
   
 public:
-  LocalGistClient(); // default sound input device
+  LocalGistClient(bool saveRecording, std::string recordingPath); // default sound input device
   LocalGistClient(std::string wavPath, int _bufferSize = 256, int _nChannels = 1,int _sampleRate = 48000); // defaults for saved Jamulus wav
+  void stopRecording();
   void closeStream() override;
 
   void process(ofSoundBuffer &input, ofSoundBuffer &output) override; // ofxSoundObject
@@ -42,6 +41,8 @@ private:
   ofxSoundPlayerObject soundPlayer; //file
   ofEventListener playerEndListener;
   float soundPlayerVolume = 1.0;
+  
+  ofxSoundRecorderObject recorder;
   
   ofxGist gist;
   int bufferSize, nChannels, sampleRate;

@@ -35,18 +35,18 @@ LocalGistClient::LocalGistClient(std::string _wavPath, int _bufferSize, int _nCh
 }
 
 // --- Device input, no output
-LocalGistClient::LocalGistClient() :
+LocalGistClient::LocalGistClient(bool saveRecording, std::string recordingPath) :
   ofxSoundObject(OFX_SOUND_OBJECT_PROCESSOR)
 {
   setupGist();
     
-  ofxSoundUtils::printInputSoundDevices();
+  ofxSoundUtils::printInputSoundDevices(); // deviceInput.getDeviceInfo().sampleRates; deviceInput.getDeviceId();
 //  auto inDevices = ofxSoundUtils::getInputSoundDevices();
-//  size_t inDeviceIndex = 2;
-//  auto& inDevice =  inDevices[inDeviceIndex];
-//  ofLogNotice() << "Using inDevice " << inDevice.name;
+//  size_t inDeviceIndex = 0;
+//  deviceInput = inDevices[inDeviceIndex];
+//  ofLogNotice() << "Using inDevice " << deviceInput.name;
 //  nChannels = inDevice.inputChannels;
-  //  ofLogNotice() << ofToString(inDevices[inDeviceIndex].sampleRates);
+//  ofLogNotice() << ofToString(inDevices[inDeviceIndex].sampleRates);
 
 //  ofxSoundUtils::printOutputSoundDevices();
 //  auto outDevices = ofxSoundUtils::getOutputSoundDevices();
@@ -67,7 +67,21 @@ LocalGistClient::LocalGistClient() :
   soundStream.setInput(deviceInput);
   soundStream.setOutput(nullOutput);
 
-  deviceInput.connectTo(*this).connectTo(nullOutput);
+  deviceInput.connectTo(recorder).connectTo(*this).connectTo(nullOutput);
+  
+  if (saveRecording) {
+    recorder.startRecording(recordingPath + "/audio-"+ofGetTimestampString()+".wav", false);
+  }
+}
+
+void LocalGistClient::stopRecording() {
+  if (recorder.isRecording()) {
+    recorder.stopRecording();
+    while(recorder.isRecording()) {
+      ofLogNotice() << ofGetTimestampString() << ": " << recorder.getRecStateString();
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+  }
 }
 
 void LocalGistClient::setupGist() {
