@@ -14,7 +14,7 @@ namespace ofxAudioAnalysisClient {
 class LocalGistClient : public BaseClient, ofxSoundObject {
   
 public:
-  LocalGistClient(bool saveRecording, std::string recordingPath); // default sound input device
+  LocalGistClient(const std::string& deviceName, bool saveRecording, std::string recordingPath);
   LocalGistClient(std::string wavPath, int _bufferSize = 256, int _nChannels = 1,int _sampleRate = 48000); // defaults for saved Jamulus wav
   void stopRecording();
   void closeStream() override;
@@ -45,7 +45,8 @@ private:
   ofxSoundRecorderObject recorder;
   
   ofxGist gist;
-  int bufferSize, nChannels, sampleRate;
+  unsigned int sampleRate;
+  int bufferSize, nChannels;
 };
 
 }

@@ -16,8 +16,9 @@ LocalGistClient::LocalGistClient(std::string _wavPath, int _bufferSize, int _nCh
   
   ofxSoundUtils::printOutputSoundDevices();
   auto outDevices = ofxSoundUtils::getOutputSoundDevices();
-  int outDeviceIndex = 0;
+  int outDeviceIndex = 3;
   cout << ofxSoundUtils::getSoundDeviceString(outDevices[outDeviceIndex], false, true) << endl;
+  cout << outDevices[outDeviceIndex].sampleRates[0] << endl;
   
   ofSoundStreamSettings settings;
   settings.numInputChannels = nChannels;
@@ -35,26 +36,25 @@ LocalGistClient::LocalGistClient(std::string _wavPath, int _bufferSize, int _nCh
 }
 
 // --- Device input, no output
-LocalGistClient::LocalGistClient(bool saveRecording, std::string recordingPath) :
+LocalGistClient::LocalGistClient(const std::string& deviceName, bool saveRecording, std::string recordingPath) :
   ofxSoundObject(OFX_SOUND_OBJECT_PROCESSOR)
 {
   setupGist();
     
-  ofxSoundUtils::printInputSoundDevices(); // deviceInput.getDeviceInfo().sampleRates; deviceInput.getDeviceId();
-//  auto inDevices = ofxSoundUtils::getInputSoundDevices();
-//  size_t inDeviceIndex = 0;
-//  deviceInput = inDevices[inDeviceIndex];
-//  ofLogNotice() << "Using inDevice " << deviceInput.name;
-//  nChannels = inDevice.inputChannels;
-//  ofLogNotice() << ofToString(inDevices[inDeviceIndex].sampleRates);
+  ofxSoundUtils::printInputSoundDevices();
+  
+  auto inDevices = ofxSoundUtils::getInputSoundDevices();
+  auto deviceIter = std::find_if(inDevices.cbegin(), inDevices.cend(), [&](const auto& d) {
+    return d.name == deviceName;
+  });
+  if (deviceIter == inDevices.end()) {
+    ofLogError() << "No device called '" << deviceName << "'";
+    ofExit();
+  }
 
-//  ofxSoundUtils::printOutputSoundDevices();
-//  auto outDevices = ofxSoundUtils::getOutputSoundDevices();
-//  size_t outDeviceIndex = 3;
-
-  nChannels = 1;
+  nChannels = deviceIter->inputChannels;
   bufferSize = 256;
-  sampleRate = 44100;
+  sampleRate = deviceIter->sampleRates[0];
   
   ofSoundStreamSettings settings;
   settings.numInputChannels = nChannels;
@@ -62,11 +62,12 @@ LocalGistClient::LocalGistClient(bool saveRecording, std::string recordingPath) 
   settings.sampleRate = sampleRate;
   settings.bufferSize = bufferSize;
   settings.numBuffers = 1; // 4
-//  settings.setInDevice(inDevice);
+  settings.setInDevice(*deviceIter);
+
   soundStream.setup(settings);
-  soundStream.setInput(deviceInput);
   soundStream.setOutput(nullOutput);
 
+  deviceInput.setInputStream(soundStream);
   deviceInput.connectTo(recorder).connectTo(*this).connectTo(nullOutput);
   
   if (saveRecording) {
