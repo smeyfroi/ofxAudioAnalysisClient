@@ -6,6 +6,9 @@
 #include "ofxIntrospector.h"
 #include "ofxGui.h"
 
+constexpr bool RECORD_AUDIO = false;
+const std::string MIC_DEVICE_NAME = "Apple Inc.: MacBook Pro Microphone";
+
 class ofApp: public ofBaseApp{
 public:
   void setup();
