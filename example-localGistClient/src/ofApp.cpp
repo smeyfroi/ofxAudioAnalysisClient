@@ -13,7 +13,7 @@ void ofApp::setup(){
 //  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(ofToDataPath("violin-tune.wav"));
   auto recordingPath = ofFilePath::getUserHomeDir()+"/Documents/MarkSynth/audio-recordings";
   std::filesystem::create_directory(recordingPath);
-  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>(MIC_DEVICE_NAME, RECORD_AUDIO, recordingPath);
+  audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>("", false, recordingPath);
   audioDataProcessorPtr = std::make_shared<ofxAudioData::Processor>(audioAnalysisClientPtr);
   audioDataPlotsPtr = std::make_shared<ofxAudioData::Plots>(audioDataProcessorPtr);
   
