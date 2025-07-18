@@ -40,7 +40,8 @@ LocalGistClient::LocalGistClient(const std::string& deviceName, bool saveRecordi
   ofxSoundObject(OFX_SOUND_OBJECT_PROCESSOR)
 {
   setupGist();
-    
+
+  ofSoundStreamSettings settings;
   ofxSoundUtils::printInputSoundDevices();
   
   auto inDevices = ofxSoundUtils::getInputSoundDevices();
@@ -49,20 +50,24 @@ LocalGistClient::LocalGistClient(const std::string& deviceName, bool saveRecordi
   });
   if (deviceIter == inDevices.end()) {
     ofLogError() << "No device called '" << deviceName << "'";
-    ofExit();
+//    ofExit();
+    // Assume IOS and set defaults for that
+    nChannels = 1;
+    sampleRate = 44100;
+    bufferSize = 512;
+    // don't set ofSoundStreamSettings device on IOS
+  } else {
+    nChannels = deviceIter->inputChannels;
+    sampleRate = deviceIter->sampleRates[0];
+    bufferSize = 256; // 512
+    settings.setInDevice(*deviceIter);
   }
-
-  nChannels = deviceIter->inputChannels;
-  bufferSize = 256;
-  sampleRate = deviceIter->sampleRates[0];
   
-  ofSoundStreamSettings settings;
   settings.numInputChannels = nChannels;
   settings.numOutputChannels = 1;
   settings.sampleRate = sampleRate;
   settings.bufferSize = bufferSize;
   settings.numBuffers = 1; // 4
-  settings.setInDevice(*deviceIter);
 
   soundStream.setup(settings);
   soundStream.setOutput(nullOutput);
