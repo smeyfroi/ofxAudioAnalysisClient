@@ -2,8 +2,6 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-  ofLogNotice()<<ofGetWindowSize();
-
   ofSetBackgroundColor(0);
   audioAnalysisClientPtr = std::make_shared<ofxAudioAnalysisClient::LocalGistClient>("", false, "");
   audioDataProcessorPtr = std::make_shared<ofxAudioData::Processor>(audioAnalysisClientPtr);
