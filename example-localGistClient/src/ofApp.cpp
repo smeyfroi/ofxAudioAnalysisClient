@@ -26,16 +26,16 @@ void ofApp::update() {
   introspector.update();
   audioDataProcessorPtr->update();
   
-  float s = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::pitch);
-  float t = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::rootMeanSquare);
-  float u = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::complexSpectralDifference);
-  float v = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::spectralCrest);
-  float w = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::zeroCrossingRate);
-
-  introspector.addCircle(s, t, 1.0/ofGetWindowWidth()*5.0, ofColor::darkGreen, true, 30); // introspection: small yellow circle for new raw source sample
-  introspector.addLine(0.0, u, 1.0, u, ofColor::grey);
-  introspector.addLine(0.0, v, 1.0, v, ofColor::darkGreen);
-  introspector.addLine(0.0, w, 1.0, w, ofColor::greenYellow);
+//  float s = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::pitch);
+//  float t = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::rootMeanSquare);
+//  float u = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::complexSpectralDifference);
+//  float v = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::spectralCentroid);
+//  float w = audioDataProcessorPtr->getNormalisedScalarValue(ofxAudioAnalysisClient::AnalysisScalar::zeroCrossingRate);
+//
+//  introspector.addCircle(s, t, 1.0/ofGetWindowWidth()*5.0, ofColor::darkGreen, true, 30); // introspection: small yellow circle for new raw source sample
+//  introspector.addLine(0.0, u, 1.0, u, ofColor::grey);
+//  introspector.addLine(0.0, v, 1.0, v, ofColor::darkGreen);
+//  introspector.addLine(0.0, w, 1.0, w, ofColor::greenYellow);
 }
 
 //--------------------------------------------------------------

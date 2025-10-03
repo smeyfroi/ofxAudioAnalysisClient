@@ -10,6 +10,10 @@
 //Zero Crossing Rate - Sound brightness
 //Root mean square - Signal energy
 
+// Spectral Centroid divergence: Timbral changes. The characteristic sound quality that distinguishes one instrument from another, even when playing the same pitch and loudness
+// RMS divergence: Dynamic changes
+// Spectral Difference divergence: Textural changes. The overall sonic fabric - how dense, smooth, rough, or complex the audio feels
+
 namespace ofxAudioAnalysisClient {
 
 // float scalars from the analysis
