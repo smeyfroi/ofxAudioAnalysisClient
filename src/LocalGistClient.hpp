@@ -42,7 +42,8 @@ private:
   ofEventListener playerEndListener;
   float soundPlayerVolume = 1.0;
   
-  ofxSoundRecorderObject recorder;
+  std::unique_ptr<ofxSoundRecorderObject>& getRecorder() const;
+  mutable std::unique_ptr<ofxSoundRecorderObject> recorderPtr;
   
   ofxGist gist;
   unsigned int sampleRate;

@@ -79,18 +79,23 @@ LocalGistClient::LocalGistClient(const std::string& deviceName, bool saveRecordi
   soundStream.setOutput(nullOutput);
 
   deviceInput.setInputStream(soundStream);
-  deviceInput.connectTo(recorder).connectTo(*this).connectTo(nullOutput);
+  deviceInput.connectTo(*getRecorder()).connectTo(*this).connectTo(nullOutput);
   
   if (saveRecording) {
-    recorder.startRecording(recordingPath + "/audio-"+ofGetTimestampString()+".wav", false);
+    getRecorder()->startRecording(recordingPath + "/audio-"+ofGetTimestampString()+".wav", false);
   }
 }
 
+std::unique_ptr<ofxSoundRecorderObject>& LocalGistClient::getRecorder() const {
+  if (!recorderPtr) recorderPtr = std::make_unique<ofxSoundRecorderObject>();
+  return recorderPtr;
+}
+
 void LocalGistClient::stopRecording() {
-  if (recorder.isRecording()) {
-    recorder.stopRecording();
-    while(recorder.isRecording()) {
-      ofLogNotice() << ofGetTimestampString() << ": " << recorder.getRecStateString();
+  if (getRecorder()->isRecording()) {
+    getRecorder()->stopRecording();
+    while(getRecorder()->isRecording()) {
+      ofLogNotice() << ofGetTimestampString() << ": " << getRecorder()->getRecStateString();
       std::this_thread::sleep_for(std::chrono::seconds(1));
     }
   }
