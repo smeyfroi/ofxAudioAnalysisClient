@@ -3,7 +3,7 @@
 namespace ofxAudioAnalysisClient {
 
 // --- File input, device output
-LocalGistClient::LocalGistClient(std::string _wavPath, int _bufferSize, int _nChannels, int _sampleRate) :
+LocalGistClient::LocalGistClient(const std::string& _wavPath, const std::string& outDeviceName, int _bufferSize, int _nChannels, int _sampleRate) :
   ofxSoundObject(OFX_SOUND_OBJECT_PROCESSOR),
   wavPath(_wavPath),
   bufferSize(_bufferSize),
@@ -14,14 +14,20 @@ LocalGistClient::LocalGistClient(std::string _wavPath, int _bufferSize, int _nCh
   
   soundPlayer.load(wavPath, false); // false to read the whole file; true to stream
   
-  ofxSoundUtils::printOutputSoundDevices();
-  auto outDevices = ofxSoundUtils::getOutputSoundDevices();
-  int outDeviceIndex = 3;
-  cout << ofxSoundUtils::getSoundDeviceString(outDevices[outDeviceIndex], false, true) << endl;
-  cout << outDevices[outDeviceIndex].sampleRates[0] << endl;
-  
   ofSoundStreamSettings settings;
-  settings.numInputChannels = nChannels;
+  ofxSoundUtils::printOutputSoundDevices();
+
+  auto outDevices = ofxSoundUtils::getOutputSoundDevices();
+  auto deviceIter = std::find_if(outDevices.cbegin(), outDevices.cend(), [&](const auto& d) {
+    return (outDeviceName.empty() && d.isDefaultInput) || (d.name == outDeviceName);
+  });
+  if (deviceIter == outDevices.end()) {
+    ofLogError() << "No device called '" << outDeviceName << "'";
+  }
+  
+  settings.setOutDevice(*deviceIter);
+  
+  settings.numInputChannels = 0;
   settings.numOutputChannels = 2;
   settings.sampleRate = soundPlayer.getSoundFile().getSampleRate();
   settings.bufferSize = bufferSize; // 256

@@ -15,7 +15,7 @@ class LocalGistClient : public BaseClient, ofxSoundObject {
   
 public:
   LocalGistClient(const std::string& deviceName, bool saveRecording, std::string recordingPath);
-  LocalGistClient(std::string wavPath, int _bufferSize = 256, int _nChannels = 1,int _sampleRate = 48000); // defaults for saved Jamulus wav
+  LocalGistClient(const std::string& wavPath, const std::string& outDeviceName = "Apple Inc.: MacBook Pro Speakers", int _bufferSize = 256, int _nChannels = 1,int _sampleRate = 48000); // defaults for saved Jamulus wav
   void stopRecording();
   void closeStream() override;
 
