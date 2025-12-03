@@ -162,6 +162,29 @@ bool LocalGistClient::keyPressed(int key) {
     soundPlayer.setVolume(soundPlayerVolume);
     return true;
   }
+  
+  // Audio playback seeking (only when playing from file)
+  if (soundPlayer.isLoaded()) {
+    int skipMS = ofGetKeyPressed(OF_KEY_SHIFT) ? 60000 : 10000; // 60s or 10s
+    
+    if (key == OF_KEY_UP) {
+      // Skip forward
+      int currentMS = soundPlayer.getPositionMS();
+      int durationMS = soundPlayer.getDurationMS();
+      soundPlayer.setPositionMS(std::min(currentMS + skipMS, (int)durationMS));
+      ofLogNotice("LocalGistClient") << "Skip forward to " << soundPlayer.getPositionMS() / 1000 << "s";
+      return true;
+    }
+    
+    if (key == OF_KEY_DOWN) {
+      // Skip backward
+      int currentMS = soundPlayer.getPositionMS();
+      soundPlayer.setPositionMS(std::max(0, currentMS - skipMS));
+      ofLogNotice("LocalGistClient") << "Skip backward to " << soundPlayer.getPositionMS() / 1000 << "s";
+      return true;
+    }
+  }
+  
   return BaseClient::keyPressed(key);
 }
 
