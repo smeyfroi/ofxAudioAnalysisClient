@@ -91,6 +91,30 @@ std::unique_ptr<ofxSoundRecorderObject>& LocalGistClient::getRecorder() const {
   return recorderPtr;
 }
 
+void LocalGistClient::startSegmentRecording(const std::string& filepath) {
+  std::lock_guard<std::mutex> lock(segmentMutex);
+  if (segmentRecordingActive) {
+    ofLogWarning("LocalGistClient") << "Segment recording already active, ignoring start request";
+    return;
+  }
+  segmentFilepath = filepath;
+  segmentRecordingPendingStart = true;
+  ofLogNotice("LocalGistClient") << "Segment recording pending start to: " << filepath;
+}
+
+void LocalGistClient::stopSegmentRecording() {
+  std::lock_guard<std::mutex> lock(segmentMutex);
+  if (!segmentRecordingActive && !segmentRecordingPendingStart) {
+    return;
+  }
+  segmentRecordingPendingStop = true;
+  ofLogNotice("LocalGistClient") << "Segment recording pending stop";
+}
+
+bool LocalGistClient::isSegmentRecording() const {
+  return segmentRecordingActive || segmentRecordingPendingStart;
+}
+
 void LocalGistClient::stopRecording() {
   if (getRecorder()->isRecording()) {
     getRecorder()->stopRecording();
@@ -119,6 +143,13 @@ void LocalGistClient::setupGist() {
 }
 
 void LocalGistClient::closeStream() {
+  // Ensure segment recording is stopped before closing stream
+  if (segmentWavHandle) {
+    drwav_uninit(segmentWavHandle);
+    segmentWavHandle = nullptr;
+    segmentRecordingActive = false;
+    ofLogNotice("LocalGistClient") << "Segment recording closed on stream shutdown";
+  }
   soundStream.close();
 }
 
@@ -146,7 +177,44 @@ void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
 //  }
 //
 //  for (auto iter = gist.getMelFrequencyCepstralCoefficients().begin(); iter !=
+  // Handle segment recording state transitions and write audio data
+  // This runs on the audio thread, so we use atomics for thread-safe state checks
+  if (segmentRecordingPendingStart.exchange(false)) {
+    // Initialize WAV file for writing
+    drwav_data_format format;
+    format.container = drwav_container_riff;
+    format.format = DR_WAVE_FORMAT_IEEE_FLOAT;
+    format.channels = input.getNumChannels();
+    format.sampleRate = input.getSampleRate();
+    format.bitsPerSample = 32;
+    
+    segmentWavHandle = drwav_open_file_write(segmentFilepath.c_str(), &format);
+    if (segmentWavHandle) {
+      segmentRecordingActive = true;
+      ofLogNotice("LocalGistClient") << "Segment recording started: " << segmentFilepath
+        << " (channels: " << format.channels << ", sampleRate: " << format.sampleRate << ")";
+    } else {
+      ofLogError("LocalGistClient") << "Failed to open segment recording file: " << segmentFilepath;
+    }
+  }
   
+  if (segmentRecordingPendingStop.exchange(false)) {
+    if (segmentWavHandle) {
+      drwav_uninit(segmentWavHandle);
+      segmentWavHandle = nullptr;
+      segmentRecordingActive = false;
+      ofLogNotice("LocalGistClient") << "Segment recording stopped: " << segmentFilepath;
+    }
+  }
+  
+  // Write audio data if recording is active
+  if (segmentRecordingActive && segmentWavHandle) {
+    drwav_uint64 framesWritten = drwav_write_pcm_frames(segmentWavHandle, input.getNumFrames(), input.getBuffer().data());
+    if (framesWritten != input.getNumFrames()) {
+      ofLogWarning("LocalGistClient") << "Segment recording: wrote " << framesWritten << " frames, expected " << input.getNumFrames();
+    }
+  }
+
   if (soundPlayerVolume > 0.0) {
     output = input;
   }

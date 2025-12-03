@@ -8,6 +8,9 @@
 #include "ofxSoundObjects.h"
 #include "ofxSoundRecorderObject.h"
 #include "NullOutput.h"
+#include "dr_wav.h"
+#include <atomic>
+#include <mutex>
 
 namespace ofxAudioAnalysisClient {
 
@@ -25,6 +28,11 @@ public:
   void playerEnded(size_t &id);
   bool keyPressed(int key) override;
 
+  // Segment recording - for recording audio clips synchronized with video recording
+  void startSegmentRecording(const std::string& filepath);
+  void stopSegmentRecording();
+  bool isSegmentRecording() const;
+  
 protected:
   int nextOscPacket() override { return 0; }; // need to refactor the base class away from being just an OSC client
   
@@ -44,6 +52,14 @@ private:
   
   std::unique_ptr<ofxSoundRecorderObject>& getRecorder() const;
   mutable std::unique_ptr<ofxSoundRecorderObject> recorderPtr;
+  
+  // Segment recording - direct WAV writing for synchronized audio/video recording
+  drwav* segmentWavHandle { nullptr };
+  std::string segmentFilepath;
+  std::atomic<bool> segmentRecordingActive { false };
+  std::atomic<bool> segmentRecordingPendingStart { false };
+  std::atomic<bool> segmentRecordingPendingStop { false };
+  std::mutex segmentMutex;
   
   ofxGist gist;
   unsigned int sampleRate;
