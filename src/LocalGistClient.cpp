@@ -224,6 +224,21 @@ void LocalGistClient::playerEnded(size_t &id) {
   ofLogNotice() << "File stream ended";
 }
 
+void LocalGistClient::setPositionSeconds(int seconds) {
+  if (!soundPlayer.isLoaded()) {
+    ofLogWarning("LocalGistClient") << "setPositionSeconds(): audio file not loaded";
+    return;
+  }
+  int ms = seconds * 1000;
+  int durationMS = static_cast<int>(soundPlayer.getDurationMS());
+  if (ms < 0 || ms > durationMS) {
+    ofLogWarning("LocalGistClient") << "setPositionSeconds(): " << seconds << "s is out of range (duration: " << durationMS / 1000 << "s)";
+    ms = std::clamp(ms, 0, durationMS);
+  }
+  soundPlayer.setPositionMS(ms);
+  ofLogNotice("LocalGistClient") << "setPositionSeconds(): set to " << seconds << "s";
+}
+
 bool LocalGistClient::keyPressed(int key) {
   if (key == '`') {
     soundPlayerVolume = 1.0 - soundPlayerVolume;

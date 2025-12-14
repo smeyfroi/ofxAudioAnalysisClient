@@ -27,6 +27,7 @@ public:
   
   void playerEnded(size_t &id);
   bool keyPressed(int key) override;
+  void setPositionSeconds(int seconds);
 
   // Segment recording - for recording audio clips synchronized with video recording
   void startSegmentRecording(const std::string& filepath);
