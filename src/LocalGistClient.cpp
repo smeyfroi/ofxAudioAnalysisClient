@@ -26,6 +26,7 @@ LocalGistClient::LocalGistClient(const std::string& _wavPath, const std::string&
   }
   
   settings.setOutDevice(*deviceIter);
+  ofLogNotice() << "Using output device: " << deviceIter->name;
   
   settings.numInputChannels = 0;
   settings.numOutputChannels = 2;
