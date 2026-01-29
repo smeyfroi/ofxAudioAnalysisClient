@@ -13,6 +13,14 @@ LocalGistClient::LocalGistClient(const std::string& _wavPath, const std::string&
   setupGist();
   
   soundPlayer.load(wavPath, false); // false to read the whole file; true to stream
+
+  const auto fileSampleRate = soundPlayer.getSoundFile().getSampleRate();
+  if (fileSampleRate > 0) {
+    if (sampleRate != static_cast<unsigned int>(fileSampleRate)) {
+      ofLogNotice("LocalGistClient") << "Overriding sampleRate " << sampleRate << " with file sampleRate " << fileSampleRate;
+    }
+    sampleRate = static_cast<unsigned int>(fileSampleRate);
+  }
   
   ofSoundStreamSettings settings;
   ofxSoundUtils::printOutputSoundDevices();
@@ -30,7 +38,7 @@ LocalGistClient::LocalGistClient(const std::string& _wavPath, const std::string&
   
   settings.numInputChannels = 0;
   settings.numOutputChannels = 2;
-  settings.sampleRate = soundPlayer.getSoundFile().getSampleRate();
+  settings.sampleRate = sampleRate;
   settings.bufferSize = bufferSize; // 256
   settings.numBuffers = 1;
   soundStream.setup(settings);
@@ -66,7 +74,7 @@ LocalGistClient::LocalGistClient(const std::string& deviceName, bool saveRecordi
   } else {
     nChannels = deviceIter->inputChannels;
     sampleRate = deviceIter->sampleRates[0];
-    bufferSize = 256; // 512
+    bufferSize = 2048;
     settings.setInDevice(*deviceIter);
   }
   

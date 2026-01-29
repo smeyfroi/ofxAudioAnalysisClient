@@ -57,7 +57,7 @@ void BaseClient::updateOsc() {
     osc::ReceivedMessage message4(element4);
     osc::ReceivedMessage::const_iterator messageIter4 = message4.ArgumentsBegin();
     float pitchEstimate = (*messageIter4++).AsFloat();
-    if (pitchEstimate < 2000) {
+    if (pitchEstimate < 4500) {
       scalarValues[AnalysisScalar::pitch] = pitchEstimate;
     }
     // /spectrum
