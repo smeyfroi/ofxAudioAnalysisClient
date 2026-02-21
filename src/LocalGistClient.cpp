@@ -27,7 +27,7 @@ LocalGistClient::LocalGistClient(const std::string& _wavPath, const std::string&
 
   auto outDevices = ofxSoundUtils::getOutputSoundDevices();
   auto deviceIter = std::find_if(outDevices.cbegin(), outDevices.cend(), [&](const auto& d) {
-    return (outDeviceName.empty() && d.isDefaultInput) || (d.name == outDeviceName);
+    return (outDeviceName.empty() && d.isDefaultOutput) || (d.name == outDeviceName);
   });
   if (deviceIter == outDevices.end()) {
     ofLogError() << "No device called '" << outDeviceName << "'";
