@@ -3,7 +3,11 @@
 namespace ofxAudioAnalysisClient {
 
 // --- File input, device output
-LocalGistClient::LocalGistClient(const std::string& _wavPath, const std::string& outDeviceName, int _bufferSize, int _nChannels, int _sampleRate) :
+LocalGistClient::LocalGistClient(const std::string& _wavPath,
+                                 const std::string& outDeviceName,
+                                 int _bufferSize,
+                                 int _nChannels,
+                                 int _sampleRate) :
   ofxSoundObject(OFX_SOUND_OBJECT_PROCESSOR),
   wavPath(_wavPath),
   bufferSize(_bufferSize),
@@ -11,7 +15,7 @@ LocalGistClient::LocalGistClient(const std::string& _wavPath, const std::string&
   sampleRate(_sampleRate)
 {
   setupGist();
-  
+
   soundPlayer.load(wavPath, false); // false to read the whole file; true to stream
 
   const auto fileSampleRate = soundPlayer.getSoundFile().getSampleRate();
@@ -21,7 +25,7 @@ LocalGistClient::LocalGistClient(const std::string& _wavPath, const std::string&
     }
     sampleRate = static_cast<unsigned int>(fileSampleRate);
   }
-  
+
   ofSoundStreamSettings settings;
   ofxSoundUtils::printOutputSoundDevices();
 
@@ -32,10 +36,10 @@ LocalGistClient::LocalGistClient(const std::string& _wavPath, const std::string&
   if (deviceIter == outDevices.end()) {
     ofLogError() << "No device called '" << outDeviceName << "'";
   }
-  
+
   settings.setOutDevice(*deviceIter);
   ofLogNotice() << "Using output device: " << deviceIter->name;
-  
+
   settings.numInputChannels = 0;
   settings.numOutputChannels = 2;
   settings.sampleRate = sampleRate;
@@ -43,7 +47,7 @@ LocalGistClient::LocalGistClient(const std::string& _wavPath, const std::string&
   settings.numBuffers = 1;
   soundStream.setup(settings);
   soundStream.setOutput(deviceOutput);
-  
+
   soundPlayer.connectTo(*this).connectTo(deviceOutput);
   soundPlayer.play();
   soundPlayer.setLoop(true);
@@ -58,14 +62,14 @@ LocalGistClient::LocalGistClient(const std::string& deviceName, bool saveRecordi
 
   ofSoundStreamSettings settings;
   ofxSoundUtils::printInputSoundDevices();
-  
+
   auto inDevices = ofxSoundUtils::getInputSoundDevices();
   auto deviceIter = std::find_if(inDevices.cbegin(), inDevices.cend(), [&](const auto& d) {
     return (deviceName.empty() && d.isDefaultInput) || (d.name == deviceName);
   });
   if (deviceIter == inDevices.end()) {
     ofLogError() << "No device called '" << deviceName << "'";
-//    ofExit();
+    //    ofExit();
     // Assume IOS and set defaults for that
     nChannels = 1;
     sampleRate = 44100;
@@ -77,7 +81,7 @@ LocalGistClient::LocalGistClient(const std::string& deviceName, bool saveRecordi
     bufferSize = 2048;
     settings.setInDevice(*deviceIter);
   }
-  
+
   settings.numInputChannels = nChannels;
   settings.numOutputChannels = 1;
   settings.sampleRate = sampleRate;
@@ -89,9 +93,9 @@ LocalGistClient::LocalGistClient(const std::string& deviceName, bool saveRecordi
 
   deviceInput.setInputStream(soundStream);
   deviceInput.connectTo(*getRecorder()).connectTo(*this).connectTo(nullOutput);
-  
+
   if (saveRecording) {
-    getRecorder()->startRecording(recordingPath + "/audio-"+ofGetTimestampString()+".wav", false);
+    getRecorder()->startRecording(recordingPath + "/audio-" + ofGetTimestampString() + ".wav", false);
   }
 }
 
@@ -102,20 +106,32 @@ std::unique_ptr<ofxSoundRecorderObject>& LocalGistClient::getRecorder() const {
 
 void LocalGistClient::startSegmentRecording(const std::string& filepath) {
   std::lock_guard<std::mutex> lock(segmentMutex);
-  if (segmentRecordingActive) {
+
+  if (segmentRecordingActive || segmentRecordingPendingStart) {
     ofLogWarning("LocalGistClient") << "Segment recording already active, ignoring start request";
     return;
   }
+
   segmentFilepath = filepath;
+  segmentRecordingPendingStop = false;
   segmentRecordingPendingStart = true;
   ofLogNotice("LocalGistClient") << "Segment recording pending start to: " << filepath;
 }
 
 void LocalGistClient::stopSegmentRecording() {
   std::lock_guard<std::mutex> lock(segmentMutex);
-  if (!segmentRecordingActive && !segmentRecordingPendingStart) {
+
+  // If the start request hasn't been consumed by the audio thread yet, just cancel it.
+  if (segmentRecordingPendingStart && !segmentRecordingActive) {
+    segmentRecordingPendingStart = false;
     return;
   }
+
+  if (!segmentRecordingActive) {
+    return;
+  }
+
+  segmentRecordingPendingStart = false;
   segmentRecordingPendingStop = true;
   ofLogNotice("LocalGistClient") << "Segment recording pending stop";
 }
@@ -127,7 +143,7 @@ bool LocalGistClient::isSegmentRecording() const {
 void LocalGistClient::stopRecording() {
   if (getRecorder()->isRecording()) {
     getRecorder()->stopRecording();
-    while(getRecorder()->isRecording()) {
+    while (getRecorder()->isRecording()) {
       ofLogNotice() << ofGetTimestampString() << ": " << getRecorder()->getRecStateString();
       std::this_thread::sleep_for(std::chrono::seconds(1));
     }
@@ -136,7 +152,7 @@ void LocalGistClient::stopRecording() {
 
 void LocalGistClient::setupGist() {
   {
-//    vector<string> features = ofxGist::getFeatureNames();
+    //    vector<string> features = ofxGist::getFeatureNames();
     const static vector<string> features {
       "GIST_ROOT_MEAN_SQUARE", "GIST_PEAK_ENERGY", "GIST_ZERO_CROSSING_RATE",
       "GIST_SPECTRAL_CENTROID", "GIST_SPECTRAL_CREST",
@@ -144,7 +160,7 @@ void LocalGistClient::setupGist() {
       "GIST_PITCH"
     };
     int num = features.size();
-    for(int v = 0; v < num; v++) {
+    for (int v = 0; v < num; v++) {
       GIST_FEATURE f = ofxGist::getFeatureFromName(features[v]);
       gist.setDetect(f);
     }
@@ -152,17 +168,26 @@ void LocalGistClient::setupGist() {
 }
 
 void LocalGistClient::closeStream() {
-  // Ensure segment recording is stopped before closing stream
-  if (segmentWavHandle) {
-    drwav_uninit(segmentWavHandle);
-    segmentWavHandle = nullptr;
-    segmentRecordingActive = false;
+  // Prevent new segment starts and request a stop.
+  segmentRecordingPendingStart = false;
+  segmentRecordingPendingStop = true;
+
+  // Close the sound stream first so the audio callback cannot race segment teardown.
+  soundStream.stop();
+  soundStream.close();
+
+  // After the stream is closed, it's safe to close the WAV handle as a fallback.
+  drwav* handle = segmentWavHandle.exchange(nullptr);
+  if (handle) {
+    drwav_close(handle);
     ofLogNotice("LocalGistClient") << "Segment recording closed on stream shutdown";
   }
-  soundStream.close();
+
+  segmentRecordingActive = false;
+  segmentRecordingPendingStop = false;
 }
 
-void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
+void LocalGistClient::process(ofSoundBuffer& input, ofSoundBuffer& output) {
   gist.processAudio(input.getBuffer(), bufferSize, nChannels, sampleRate);
 
   scalarValues[AnalysisScalar::rootMeanSquare] = gist.getValue(GIST_ROOT_MEAN_SQUARE);
@@ -174,53 +199,76 @@ void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
   scalarValues[AnalysisScalar::complexSpectralDifference] = gist.getValue(GIST_SPECTRAL_DIFFERENCE_COMPLEX);
   float pitchEstimate = gist.getValue(GIST_PITCH);
   if (pitchEstimate < 5000.0 && pitchEstimate > 10.0) scalarValues[AnalysisScalar::pitch] = pitchEstimate;
-  
-//  auto mfccs = gist.getMelFrequencyCepstralCoefficients();
-//  if (mfccs.size() != mfcc.size()) {
-//    if (mfcc.size() != 0) ofLogError() << "mfcc of size " << mfccs.size() << " != previous size " << mfcc.size();
-//    mfcc.resize(mfccs.size());
-//  }
-//  int i = 0;
-//  for (auto iter = message7.ArgumentsBegin(); iter != message7.ArgumentsEnd(); iter++) {
-//    mfcc[i++] = (*iter).AsFloat();
-//  }
-//
-//  for (auto iter = gist.getMelFrequencyCepstralCoefficients().begin(); iter !=
-  // Handle segment recording state transitions and write audio data
-  // This runs on the audio thread, so we use atomics for thread-safe state checks
+
+  //  auto mfccs = gist.getMelFrequencyCepstralCoefficients();
+  //  if (mfccs.size() != mfcc.size()) {
+  //    if (mfcc.size() != 0) ofLogError() << "mfcc of size " << mfccs.size() << " != previous size " << mfcc.size();
+  //    mfcc.resize(mfccs.size());
+  //  }
+  //  int i = 0;
+  //  for (auto iter = message7.ArgumentsBegin(); iter != message7.ArgumentsEnd(); iter++) {
+  //    mfcc[i++] = (*iter).AsFloat();
+  //  }
+  //
+  //  for (auto iter = gist.getMelFrequencyCepstralCoefficients().begin(); iter !=
+
+  // Handle segment recording state transitions and write audio data.
+  // This runs on the audio thread.
+  if (segmentRecordingPendingStop.exchange(false)) {
+    // Stop wins over any pending start.
+    segmentRecordingPendingStart = false;
+
+    std::string filepath;
+    {
+      std::lock_guard<std::mutex> lock(segmentMutex);
+      filepath = segmentFilepath;
+    }
+
+    drwav* handle = segmentWavHandle.exchange(nullptr);
+    segmentRecordingActive = false;
+    if (handle) {
+      drwav_close(handle);
+      ofLogNotice("LocalGistClient") << "Segment recording stopped: " << filepath;
+    }
+  }
+
   if (segmentRecordingPendingStart.exchange(false)) {
-    // Initialize WAV file for writing
+    // Initialize WAV file for writing.
     drwav_data_format format;
     format.container = drwav_container_riff;
     format.format = DR_WAVE_FORMAT_IEEE_FLOAT;
     format.channels = input.getNumChannels();
     format.sampleRate = input.getSampleRate();
     format.bitsPerSample = 32;
-    
-    segmentWavHandle = drwav_open_file_write(segmentFilepath.c_str(), &format);
-    if (segmentWavHandle) {
+
+    std::string filepath;
+    {
+      std::lock_guard<std::mutex> lock(segmentMutex);
+      filepath = segmentFilepath;
+    }
+
+    drwav* handle = drwav_open_file_write(filepath.c_str(), &format);
+    if (handle) {
+      segmentWavHandle.store(handle);
       segmentRecordingActive = true;
-      ofLogNotice("LocalGistClient") << "Segment recording started: " << segmentFilepath
-        << " (channels: " << format.channels << ", sampleRate: " << format.sampleRate << ")";
+      ofLogNotice("LocalGistClient") << "Segment recording started: " << filepath
+                                     << " (channels: " << format.channels << ", sampleRate: " << format.sampleRate
+                                     << ")";
     } else {
-      ofLogError("LocalGistClient") << "Failed to open segment recording file: " << segmentFilepath;
+      ofLogError("LocalGistClient") << "Failed to open segment recording file: " << filepath;
     }
   }
-  
-  if (segmentRecordingPendingStop.exchange(false)) {
-    if (segmentWavHandle) {
-      drwav_uninit(segmentWavHandle);
-      segmentWavHandle = nullptr;
-      segmentRecordingActive = false;
-      ofLogNotice("LocalGistClient") << "Segment recording stopped: " << segmentFilepath;
-    }
-  }
-  
-  // Write audio data if recording is active
-  if (segmentRecordingActive && segmentWavHandle) {
-    drwav_uint64 framesWritten = drwav_write_pcm_frames(segmentWavHandle, input.getNumFrames(), input.getBuffer().data());
-    if (framesWritten != input.getNumFrames()) {
-      ofLogWarning("LocalGistClient") << "Segment recording: wrote " << framesWritten << " frames, expected " << input.getNumFrames();
+
+  // Write audio data if recording is active.
+  if (segmentRecordingActive) {
+    drwav* handle = segmentWavHandle.load();
+    if (handle) {
+      drwav_uint64 framesWritten =
+          drwav_write_pcm_frames(handle, input.getNumFrames(), input.getBuffer().data());
+      if (framesWritten != input.getNumFrames()) {
+        ofLogWarning("LocalGistClient") << "Segment recording: wrote " << framesWritten
+                                        << " frames, expected " << input.getNumFrames();
+      }
     }
   }
 
@@ -229,7 +277,7 @@ void LocalGistClient::process(ofSoundBuffer &input, ofSoundBuffer &output) {
   }
 }
 
-void LocalGistClient::playerEnded(size_t &id) {
+void LocalGistClient::playerEnded(size_t& id) {
   ofLogNotice() << "File stream ended";
 }
 
@@ -241,7 +289,8 @@ void LocalGistClient::setPositionSeconds(int seconds) {
   int ms = seconds * 1000;
   int durationMS = static_cast<int>(soundPlayer.getDurationMS());
   if (ms < 0 || ms > durationMS) {
-    ofLogWarning("LocalGistClient") << "setPositionSeconds(): " << seconds << "s is out of range (duration: " << durationMS / 1000 << "s)";
+    ofLogWarning("LocalGistClient") << "setPositionSeconds(): " << seconds
+                                    << "s is out of range (duration: " << durationMS / 1000 << "s)";
     ms = std::clamp(ms, 0, durationMS);
   }
   soundPlayer.setPositionMS(ms);
@@ -254,11 +303,11 @@ bool LocalGistClient::keyPressed(int key) {
     soundPlayer.setVolume(soundPlayerVolume);
     return true;
   }
-  
+
   // Audio playback seeking (only when playing from file)
   if (soundPlayer.isLoaded()) {
     int skipMS = ofGetKeyPressed(OF_KEY_SHIFT) ? 60000 : 10000; // 60s or 10s
-    
+
     if (key == OF_KEY_UP) {
       // Skip forward
       int currentMS = soundPlayer.getPositionMS();
@@ -267,7 +316,7 @@ bool LocalGistClient::keyPressed(int key) {
       ofLogNotice("LocalGistClient") << "Skip forward to " << soundPlayer.getPositionMS() / 1000 << "s";
       return true;
     }
-    
+
     if (key == OF_KEY_DOWN) {
       // Skip backward
       int currentMS = soundPlayer.getPositionMS();
@@ -276,7 +325,7 @@ bool LocalGistClient::keyPressed(int key) {
       return true;
     }
   }
-  
+
   return BaseClient::keyPressed(key);
 }
 
