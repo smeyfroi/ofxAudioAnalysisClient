@@ -1,3 +1,6 @@
+OBSOLETE IN FAVOUR OF ofxAudioData
+
+
 ofxAddonTemplate
 ================
 
